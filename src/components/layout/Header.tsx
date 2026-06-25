@@ -42,7 +42,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 w-full z-50 transition-all duration-300",
+        "site-header fixed top-0 left-0 w-full z-50 transition-all duration-300",
         scrolled
           ? "bg-bg-primary/95 backdrop-blur-xl shadow-lg"
           : "bg-bg-secondary"

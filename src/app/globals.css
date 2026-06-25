@@ -40,7 +40,7 @@ html {
   scroll-behavior: smooth;
 }
 
-header {
+header.site-header {
   position: fixed !important;
   will-change: transform;
 }

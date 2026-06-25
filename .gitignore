@@ -34,3 +34,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# logs
+*.log
+
+# large media
+*.mp4
+
+# test
+test-screenshot.mjs

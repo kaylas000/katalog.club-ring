@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Search, ChevronDown, SlidersHorizontal, ShoppingBag, Star } from "lucide-react";
@@ -24,14 +24,6 @@ export default function CategoryPage() {
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(true);
   const addToCart = useCart((s) => s.addToCart);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (window.scrollY > 50) setMobileOpen(false);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const categoryInfo = shopCategories.find((c) => c.slug === category);
 

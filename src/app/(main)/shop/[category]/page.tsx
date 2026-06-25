@@ -22,7 +22,7 @@ export default function CategoryPage() {
   const category = params.category as string;
   const [sortBy, setSortBy] = useState("new");
   const [search, setSearch] = useState("");
-  const [mobileOpen, setMobileOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const addToCart = useCart((s) => s.addToCart);
 
   const categoryInfo = shopCategories.find((c) => c.slug === category);
@@ -85,7 +85,7 @@ export default function CategoryPage() {
         </div>
       </section>
 
-      <section className="bg-bg-primary border-b border-border sticky top-16 lg:top-[72px] z-50 relative">
+      <section className="bg-bg-primary border-b border-border sticky top-16 lg:top-[72px] z-40">
         <div className="max-w-7xl mx-auto px-5 py-3">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

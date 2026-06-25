@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, ChevronDown, SlidersHorizontal, ShoppingBag, Star } from "lucide-react";
 import { products } from "@/lib/data/products.data";
@@ -20,16 +20,8 @@ export default function ShopPageClient() {
   const [sortBy, setSortBy] = useState("new");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [mobileOpen, setMobileOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const addToCart = useCart((s) => s.addToCart);
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (window.scrollY > 50) setMobileOpen(false);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const filtered = useMemo(() => {
     let result = [...products];
@@ -92,7 +84,7 @@ export default function ShopPageClient() {
         </div>
       </section>
 
-      <section className="bg-bg-primary border-b border-border sticky top-16 z-40">
+      <section className="bg-bg-primary border-b border-border sticky top-16 lg:top-[72px] z-40">
         <div className="max-w-7xl mx-auto px-5 py-3">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

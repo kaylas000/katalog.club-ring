@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Search, ChevronDown, SlidersHorizontal, ShoppingBag, Star } from "lucide-react";
@@ -24,20 +24,27 @@ export default function CategoryPage() {
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(true);
   const addToCart = useCart((s) => s.addToCart);
+  const prevScrollY = useRef(0);
+  const ignoreScroll = useRef(false);
 
   useEffect(() => {
-    let locked = false;
+    prevScrollY.current = window.scrollY;
     const onScroll = () => {
-      if (locked) return;
-      if (window.scrollY > 50) setMobileOpen(false);
+      if (ignoreScroll.current) return;
+      const current = window.scrollY;
+      if (current > prevScrollY.current && current > 80) {
+        setMobileOpen(false);
+      }
+      prevScrollY.current = current;
     };
-    const lock = () => { locked = true; setTimeout(() => { locked = false; }, 200); };
     window.addEventListener("scroll", onScroll, { passive: true });
-    document.addEventListener("click", lock, true);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("click", lock, true);
-    };
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleToggle = useCallback(() => {
+    ignoreScroll.current = true;
+    setMobileOpen((prev) => !prev);
+    setTimeout(() => { ignoreScroll.current = false; }, 300);
   }, []);
 
   const categoryInfo = shopCategories.find((c) => c.slug === category);
@@ -103,7 +110,7 @@ export default function CategoryPage() {
       <section className="bg-bg-primary border-b border-border sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-5 py-3">
           <button
-            onClick={() => setMobileOpen(!mobileOpen)}
+            onClick={handleToggle}
             className="flex items-center justify-between w-full py-2"
           >
             <div className="flex items-center gap-2">

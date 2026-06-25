@@ -143,8 +143,9 @@ export default function CheckoutPage() {
                 <div className="bg-bg-card border border-border rounded-xl p-6">
                   <h2 className="font-heading font-semibold text-text-primary text-lg mb-4">Способ оплаты</h2>
                   <div className="space-y-3">
-                    <label className="flex items-center gap-3 p-4 border border-bronze/30 bg-bronze/5 rounded-xl cursor-pointer">
+                    <label htmlFor="payment-card" className="flex items-center gap-3 p-4 border border-bronze/30 bg-bronze/5 rounded-xl cursor-pointer">
                       <input
+                        id="payment-card"
                         type="radio"
                         name="payment"
                         value="card"
@@ -158,8 +159,9 @@ export default function CheckoutPage() {
                         <div className="text-xs text-text-muted">Visa, Mastercard, МИР</div>
                       </div>
                     </label>
-                    <label className="flex items-center gap-3 p-4 border border-border rounded-xl cursor-pointer hover:border-silver transition-colors">
+                    <label htmlFor="payment-cash" className="flex items-center gap-3 p-4 border border-border rounded-xl cursor-pointer hover:border-silver transition-colors">
                       <input
+                        id="payment-cash"
                         type="radio"
                         name="payment"
                         value="cash"

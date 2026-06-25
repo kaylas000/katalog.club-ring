@@ -93,6 +93,8 @@ export function ClubFilters({ clubs, onFilterChange }: ClubFiltersProps) {
             <div className="relative min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
               <input
+                id="club-filter-search"
+                name="search"
                 type="text"
                 placeholder="Поиск зала..."
                 value={search}
@@ -102,6 +104,8 @@ export function ClubFilters({ clubs, onFilterChange }: ClubFiltersProps) {
             </div>
 
             <select
+              id="club-filter-sort"
+              name="sort"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="bg-bg-card border border-border rounded-lg px-3 py-2 text-sm text-text-secondary focus:border-bronze focus:outline-none"
@@ -138,6 +142,8 @@ export function ClubFilters({ clubs, onFilterChange }: ClubFiltersProps) {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                   <input
+                    id="club-filter-search-mobile"
+                    name="search"
                     type="text"
                     placeholder="Поиск зала..."
                     value={search}
@@ -173,6 +179,8 @@ export function ClubFilters({ clubs, onFilterChange }: ClubFiltersProps) {
                     Город
                   </div>
                   <input
+                    id="club-filter-city"
+                    name="city"
                     type="text"
                     placeholder="Введите город..."
                     value={citySearch}
@@ -220,6 +228,8 @@ export function ClubFilters({ clubs, onFilterChange }: ClubFiltersProps) {
 
                 <div className="flex gap-2">
                   <select
+                    id="club-filter-sort-mobile"
+                    name="sort"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                     className="flex-1 bg-bg-card border border-border rounded-lg px-3 py-2 text-sm text-text-secondary focus:border-bronze focus:outline-none"

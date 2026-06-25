@@ -5,10 +5,13 @@ import { getArticleBySlug, getAllArticles } from "@/lib/data/articles.data";
 import ShareButtons from "./ShareButtons";
 import RelatedArticles from "./RelatedArticles";
 
-export const dynamic = "force-dynamic";
-
 interface Props {
   params: { slug: string };
+}
+
+export async function generateStaticParams() {
+  const articles = await getAllArticles();
+  return articles.map((a) => ({ slug: a.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

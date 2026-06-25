@@ -2,8 +2,6 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { getAllArticles } from "@/lib/data/articles.data";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: "Статьи и Блог о Боксе | Club-Ring",
   description:

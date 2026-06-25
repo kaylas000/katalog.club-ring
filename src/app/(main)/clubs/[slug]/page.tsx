@@ -6,6 +6,10 @@ type Props = {
   params: { slug: string };
 };
 
+export function generateStaticParams() {
+  return clubs.map((c) => ({ slug: c.slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = params;
   const club = clubs.find((c) => c.slug === slug);

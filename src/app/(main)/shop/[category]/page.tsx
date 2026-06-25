@@ -105,6 +105,8 @@ export default function CategoryPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
                 <input
+                  id="shop-search"
+                  name="search"
                   type="text"
                   placeholder="Поиск товаров..."
                   value={search}
@@ -141,6 +143,8 @@ export default function CategoryPage() {
 
               <div className="flex gap-2">
                 <select
+                  id="shop-sort"
+                  name="sort"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="flex-1 bg-bg-card border border-border rounded-lg px-3 py-2 text-sm text-text-secondary focus:border-bronze focus:outline-none"

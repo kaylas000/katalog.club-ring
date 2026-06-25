@@ -67,8 +67,10 @@ export default function CheckoutPage() {
                   <h2 className="font-heading font-semibold text-text-primary text-lg mb-4">Контактные данные</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-text-muted mb-2">Имя *</label>
+                      <label htmlFor="checkout-name" className="block text-xs text-text-muted mb-2">Имя *</label>
                       <input
+                        id="checkout-name"
+                        name="name"
                         type="text"
                         required
                         value={formData.name}
@@ -78,8 +80,10 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-text-muted mb-2">Телефон *</label>
+                      <label htmlFor="checkout-phone" className="block text-xs text-text-muted mb-2">Телефон *</label>
                       <input
+                        id="checkout-phone"
+                        name="phone"
                         type="tel"
                         required
                         value={formData.phone}
@@ -89,8 +93,10 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="block text-xs text-text-muted mb-2">Email *</label>
+                      <label htmlFor="checkout-email" className="block text-xs text-text-muted mb-2">Email *</label>
                       <input
+                        id="checkout-email"
+                        name="email"
                         type="email"
                         required
                         value={formData.email}
@@ -106,8 +112,10 @@ export default function CheckoutPage() {
                   <h2 className="font-heading font-semibold text-text-primary text-lg mb-4">Адрес доставки</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs text-text-muted mb-2">Город *</label>
+                      <label htmlFor="checkout-city" className="block text-xs text-text-muted mb-2">Город *</label>
                       <input
+                        id="checkout-city"
+                        name="city"
                         type="text"
                         required
                         value={formData.city}
@@ -117,8 +125,10 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="block text-xs text-text-muted mb-2">Адрес *</label>
+                      <label htmlFor="checkout-address" className="block text-xs text-text-muted mb-2">Адрес *</label>
                       <input
+                        id="checkout-address"
+                        name="address"
                         type="text"
                         required
                         value={formData.address}

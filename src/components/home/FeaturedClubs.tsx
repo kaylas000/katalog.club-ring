@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { clubs } from "@/lib/data/clubs.data";
 import { formatPrice } from "@/lib/utils/formatters";
+import { ClubCardPhoto } from "@/components/clubs/ClubCardPhoto";
 
 const tagLabels: Record<string, string> = {
   children: "Дети",
@@ -48,9 +49,11 @@ export function FeaturedClubs() {
               >
                 <div className="grid gap-4 p-4" style={{ gridTemplateColumns: "180px minmax(0,1fr)" }}>
                   <div className="relative aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-bronze/10 to-bg-elevated shrink-0">
-                    <div className="absolute inset-0 flex items-center justify-center text-4xl font-heading text-bronze/30">
-                      {club.name.charAt(0)}
-                    </div>
+                    <ClubCardPhoto
+                      photos={club.photos}
+                      fallback={club.name.charAt(0)}
+                      alt={club.name}
+                    />
                     {club.isVerified && (
                       <div className="absolute top-2 left-2 z-10">
                         <span className="tag-bronze text-[10px]">✓ Verified</span>
@@ -119,9 +122,11 @@ export function FeaturedClubs() {
               className="bg-bg-card border border-border rounded-xl overflow-hidden transition-all duration-300 hover:border-bronze-dark hover:shadow-card-hover group"
             >
               <div className="relative w-full aspect-square bg-gradient-to-br from-bronze/10 to-bg-elevated overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center text-4xl font-heading text-bronze/30">
-                  {club.name.charAt(0)}
-                </div>
+                <ClubCardPhoto
+                  photos={club.photos}
+                  fallback={club.name.charAt(0)}
+                  alt={club.name}
+                />
                 {club.isVerified && (
                   <div className="absolute top-2 left-2 z-10">
                     <span className="tag-bronze text-[10px]">✓ Verified</span>

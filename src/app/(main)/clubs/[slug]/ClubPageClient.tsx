@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { MapPin, Phone, Mail, Star, Check, ChevronRight, ChevronLeft } from "lucide-react";
 import { clubs } from "@/lib/data/clubs.data";
@@ -84,10 +84,12 @@ export default function ClubPageClient({ slug }: { slug: string }) {
             {club.photos.length > 0 && (
               <div className="rounded-xl overflow-hidden" style={{ background: "linear-gradient(160deg, #1a1a1f 0%, #111114 55%, #111114 100%)", border: "1px solid rgba(201,162,39,0.1)" }}>
                 <div className="p-4">
-                  <div className="bg-bg-card border border-border rounded-xl overflow-hidden flex items-center justify-center aspect-[16/9] lg:h-[500px] mb-4">
-                    <div className="w-full h-full bg-gradient-to-br from-bronze/10 to-bg-elevated flex items-center justify-center">
-                      <span className="text-6xl font-heading text-bronze/20">{club.name.charAt(0)}</span>
-                    </div>
+                  <div className="rounded-xl overflow-hidden aspect-video lg:aspect-auto lg:h-[500px] mb-4" style={{ border: "2px solid #C9A227" }}>
+                    <img
+                      src={club.photos[activePhoto]}
+                      alt={`${club.name} — фото ${activePhoto + 1}`}
+                      style={{ width: "calc(100% - 16px)", height: "calc(100% - 16px)", objectFit: "contain", display: "block", margin: "8px auto" }}
+                    />
                   </div>
 
                   <div className="hidden sm:flex gap-2.5">
@@ -102,9 +104,11 @@ export default function ClubPageClient({ slug }: { slug: string }) {
                             : "border-border hover:border-bronze/30"
                         )}
                       >
-                        <div className="w-full h-full bg-gradient-to-br from-bronze/5 to-bg-elevated flex items-center justify-center">
-                          <span className="text-sm font-heading text-bronze/20">{i + 1}</span>
-                        </div>
+                        <img
+                          src={club.photos[i]}
+                          alt={`Фото ${i + 1}`}
+                          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                        />
                       </button>
                     ))}
                   </div>

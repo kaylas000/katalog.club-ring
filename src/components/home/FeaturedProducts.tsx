@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, ShoppingBag, Star } from "lucide-react";
 import { products } from "@/lib/data/products.data";

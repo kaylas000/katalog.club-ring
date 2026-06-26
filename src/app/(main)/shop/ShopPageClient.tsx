@@ -84,7 +84,7 @@ export default function ShopPageClient() {
         </div>
       </section>
 
-      <section className="bg-bg-primary border-b border-border sticky top-16 z-40">
+      <section className="bg-bg-primary border-b border-border sticky top-16 lg:top-[72px] z-40">
         <div className="max-w-7xl mx-auto px-5 py-3">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

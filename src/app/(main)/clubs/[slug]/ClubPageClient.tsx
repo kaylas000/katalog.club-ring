@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { MapPin, Phone, Mail, Star, Check, ChevronRight, ChevronLeft } from "lucide-react";
 import { clubs } from "@/lib/data/clubs.data";

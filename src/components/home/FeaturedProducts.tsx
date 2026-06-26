@@ -6,7 +6,7 @@ import { useCart } from "@/lib/store/cart";
 
 export function FeaturedProducts() {
   const featured = products.filter((p) => p.isFeatured).slice(0, 4);
-  const addToCart = useCart((s) => s.addItem);
+  const addToCart = useCart((s) => s.addToCart);
 
   return (
     <section className="py-8">

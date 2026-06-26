@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ShoppingBag, Star, Check, ChevronRight } from "lucide-react";
+import { ShoppingBag, Star, Check, ChevronRight, ChevronLeft } from "lucide-react";
 import { products } from "@/lib/data/products.data";
 import { formatPrice } from "@/lib/utils/formatters";
 import { cn } from "@/lib/utils/cn";
@@ -20,6 +20,16 @@ export default function ProductPage() {
   const [selectedVariant, setSelectedVariant] = useState<string | null>(
     product?.variants?.[0]?.id || null
   );
+  const [activePhoto, setActivePhoto] = useState(0);
+
+  const allPhotos = [
+    product?.coverImage,
+    ...(product?.images || []),
+  ].filter((p, i, arr) => p && arr.indexOf(p) === i);
+
+  while (allPhotos.length < 4) {
+    allPhotos.push(allPhotos[allPhotos.length - 1] || "");
+  }
 
   if (!product) {
     return (
@@ -59,27 +69,70 @@ export default function ProductPage() {
       <section className="py-8 lg:py-12">
         <div className="max-w-7xl mx-auto px-5">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            <div className="relative aspect-square bg-bg-card border border-border rounded-xl overflow-hidden">
-              <div className="w-full h-full flex items-center justify-center text-8xl font-heading text-bronze/15">
-                {product.name.charAt(0)}
+            <div className="rounded-xl overflow-hidden" style={{ background: "linear-gradient(160deg, #1a1a1f 0%, #111114 55%, #111114 100%)", border: "1px solid rgba(201,162,39,0.1)" }}>
+              <div className="p-4">
+                <div className="relative rounded-xl overflow-hidden aspect-square mb-4" style={{ border: "2px solid #C9A227" }}>
+                  <img
+                    src={allPhotos[activePhoto]}
+                    alt={`${product.name} — фото ${activePhoto + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                    {product.isNew && (
+                      <span className="bg-bronze text-bg-primary text-[10px] font-bold px-3 py-1.5 rounded tracking-wider">
+                        NEW
+                      </span>
+                    )}
+                    {product.isBestseller && (
+                      <span className="bg-bronze-dark text-white text-[10px] font-bold px-3 py-1.5 rounded tracking-wider flex items-center gap-1">
+                        <Star className="w-3 h-3" />
+                        TOP
+                      </span>
+                    )}
+                    {product.comparePrice && (
+                      <span className="bg-error text-white text-[10px] font-bold px-3 py-1.5 rounded tracking-wider">
+                        SALE
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="hidden sm:flex gap-2.5">
+                  {allPhotos.slice(0, 4).map((src, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActivePhoto(i)}
+                      className={cn(
+                        "flex-1 h-[80px] rounded-xl border overflow-hidden transition-all",
+                        activePhoto === i
+                          ? "border-bronze/50 ring-1 ring-bronze/30"
+                          : "border-border hover:border-bronze/30"
+                      )}
+                    >
+                      <img
+                        src={src}
+                        alt={`Фото ${i + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
-                {product.isNew && (
-                  <span className="bg-bronze text-bg-primary text-[10px] font-bold px-3 py-1.5 rounded tracking-wider">
-                    NEW
-                  </span>
-                )}
-                {product.isBestseller && (
-                  <span className="bg-bronze-dark text-white text-[10px] font-bold px-3 py-1.5 rounded tracking-wider flex items-center gap-1">
-                    <Star className="w-3 h-3" />
-                    TOP
-                  </span>
-                )}
-                {product.comparePrice && (
-                  <span className="bg-error text-white text-[10px] font-bold px-3 py-1.5 rounded tracking-wider">
-                    SALE
-                  </span>
-                )}
+
+              <div className="sm:hidden flex items-center justify-center gap-4 py-3 border-t border-border/30">
+                <button
+                  onClick={() => setActivePhoto((prev) => (prev > 0 ? prev - 1 : allPhotos.length - 1))}
+                  className="w-10 h-10 rounded-full border border-border/50 bg-bg-elevated/50 flex items-center justify-center text-text-secondary hover:text-bronze transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <span className="text-sm text-text-secondary font-mono">{activePhoto + 1} / {allPhotos.length}</span>
+                <button
+                  onClick={() => setActivePhoto((prev) => (prev < allPhotos.length - 1 ? prev + 1 : 0))}
+                  className="w-10 h-10 rounded-full border border-border/50 bg-bg-elevated/50 flex items-center justify-center text-text-secondary hover:text-bronze transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
             </div>
 

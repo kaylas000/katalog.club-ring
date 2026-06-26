@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ShoppingBag, Star } from "lucide-react";
 import { products } from "@/lib/data/products.data";
 import { formatPrice } from "@/lib/utils/formatters";
+import { useCart } from "@/lib/store/cart";
 
 export function FeaturedProducts() {
   const featured = products.filter((p) => p.isFeatured).slice(0, 4);
+  const addToCart = useCart((s) => s.addItem);
 
   return (
     <section className="py-8">
@@ -24,54 +26,59 @@ export function FeaturedProducts() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {featured.map((product) => (
-            <Link
+            <div
               key={product.id}
-              href={`/shop/${product.category}/${product.slug}`}
-              className="card-base card-hover group"
+              className="group relative bg-bg-card border border-border rounded-lg overflow-hidden hover:border-bronze/30 transition-all duration-500"
             >
-              <div className="relative h-48 lg:h-56 bg-bg-elevated">
-                <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/80 to-transparent z-10" />
-                {product.isNew && (
-                  <span className="absolute top-3 left-3 z-20 tag-bronze text-[10px]">
-                    NEW
-                  </span>
-                )}
-                {product.isBestseller && (
-                  <span className="absolute top-3 left-3 z-20 tag-silver text-[10px]">
-                    BESTSELLER
-                  </span>
-                )}
-              </div>
-              <div className="p-4">
-                <p className="font-mono text-[11px] text-bronze uppercase tracking-wider mb-1">
-                  {product.brand}
-                </p>
-                <h3 className="font-heading font-semibold text-text-primary text-sm mb-2 line-clamp-2 group-hover:text-bronze transition-colors">
-                  {product.name}
-                </h3>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <span className="text-bronze text-xs">★</span>
-                  <span className="text-xs font-medium text-text-primary">
-                    {product.rating}
-                  </span>
-                  <span className="text-xs text-text-muted">
-                    ({product.reviewCount})
-                  </span>
+              <Link
+                href={`/shop/${product.category}/${product.slug}`}
+                className="block relative aspect-square overflow-hidden bg-bg-elevated"
+              >
+                <img src={product.coverImage} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addToCart(product, product.variants[0]?.value || "default");
+                    }}
+                    className="bg-bronze text-bg-primary px-6 py-3 rounded-md font-medium text-sm flex items-center gap-2 hover:bg-bronze-light transition-colors"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    В КОРЗИНУ
+                  </button>
                 </div>
-                <div className="flex items-center gap-2">
-                  {product.comparePrice && (
-                    <span className="text-xs text-text-muted line-through">
-                      {formatPrice(product.comparePrice)}
+                <div className="absolute top-3 left-3 flex flex-col gap-2">
+                  {product.isNew && (
+                    <span className="bg-bronze text-bg-primary text-[10px] font-bold px-2 py-1 rounded tracking-wider">NEW</span>
+                  )}
+                  {product.isBestseller && (
+                    <span className="bg-bronze-dark text-white text-[10px] font-bold px-2 py-1 rounded tracking-wider flex items-center gap-1">
+                      <Star className="w-3 h-3" /> TOP
                     </span>
                   )}
-                  <span className="font-heading font-semibold text-bronze">
-                    {formatPrice(product.price)}
-                  </span>
+                  {product.comparePrice && (
+                    <span className="bg-error text-white text-[10px] font-bold px-2 py-1 rounded tracking-wider">SALE</span>
+                  )}
+                </div>
+              </Link>
+
+              <div className="p-4">
+                <div className="text-[10px] text-text-muted tracking-widest uppercase mb-1">{product.brand}</div>
+                <Link href={`/shop/${product.category}/${product.slug}`}>
+                  <h3 className="font-display text-lg text-text-primary group-hover:text-bronze transition-colors leading-tight">
+                    {product.name}
+                  </h3>
+                </Link>
+                <div className="mt-3 flex items-center gap-3">
+                  <span className="text-bronze font-display text-xl">{formatPrice(product.price)}</span>
+                  {product.comparePrice && (
+                    <span className="text-text-muted line-through text-sm">{formatPrice(product.comparePrice)}</span>
+                  )}
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
 

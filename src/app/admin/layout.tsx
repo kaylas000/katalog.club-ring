@@ -10,29 +10,15 @@ export default function AdminLayout({
   const [password, setPassword] = useState("");
   const [isAuth, setIsAuth] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    try {
-      const res = await fetch("/api/admin/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-
-      if (res.ok) {
-        setIsAuth(true);
-      } else {
-        setError("Неверный пароль");
-      }
-    } catch {
-      setError("Ошибка соединения");
-    } finally {
-      setLoading(false);
+    if (password === "clubring2024") {
+      setIsAuth(true);
+    } else {
+      setError("Неверный пароль");
     }
   };
 
@@ -64,10 +50,9 @@ export default function AdminLayout({
             </div>
             <button
               type="submit"
-              disabled={loading}
               className="btn-primary w-full"
             >
-              {loading ? "Проверка..." : "Войти"}
+              Войти
             </button>
           </form>
         </div>

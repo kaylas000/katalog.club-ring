@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Article } from "@/lib/types";
+import type { Article } from "@/lib/types";
+import initialArticles from "@/lib/data/articles.json";
 
 const CATEGORIES = [
   "Новости бокса",
@@ -11,6 +12,8 @@ const CATEGORIES = [
   "Мотивация",
   "Анализ",
 ];
+
+const STORAGE_KEY = "clubring_articles";
 
 interface FormData {
   title: string;
@@ -23,10 +26,6 @@ interface FormData {
   isPublished: boolean;
   isExternal: boolean;
   externalUrl: string;
-}
-
-interface UploadResult {
-  path: string;
 }
 
 const emptyForm: FormData = {
@@ -42,41 +41,39 @@ const emptyForm: FormData = {
   externalUrl: "",
 };
 
+function loadArticles(): Article[] {
+  if (typeof window === "undefined") return initialArticles as Article[];
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(initialArticles));
+  return initialArticles as Article[];
+}
+
+function saveArticles(articles: Article[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(articles));
+}
+
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9а-яё]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export default function AdminPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetchArticles();
+    setArticles(loadArticles());
   }, []);
-
-  async function handleFileUpload(file: File): Promise<string | null> {
-    setUploading(true);
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      if (res.ok) {
-        const data: UploadResult = await res.json();
-        return data.path;
-      }
-      const err = await res.json();
-      setMessage(err.error || "Ошибка загрузки");
-      return null;
-    } catch {
-      setMessage("Ошибка загрузки файла");
-      return null;
-    } finally {
-      setUploading(false);
-    }
-  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -85,69 +82,54 @@ export default function AdminPage() {
     setPreviewUrl(url);
   }
 
-  async function fetchArticles() {
-    try {
-      const res = await fetch("/api/admin/articles");
-      if (res.ok) {
-        setArticles(await res.json());
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setMessage("");
 
     let coverImage = form.coverImage;
-    const file = fileInputRef.current?.files?.[0];
-    if (file) {
-      const uploaded = await handleFileUpload(file);
-      if (uploaded) {
-        coverImage = uploaded;
-      } else {
-        setSaving(false);
-        return;
-      }
+    if (previewUrl) {
+      coverImage = previewUrl;
     }
 
-    const body = {
-      ...form,
-      coverImage,
-      tags: form.tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
-    };
+    const tags = form.tags.split(",").map((t) => t.trim()).filter(Boolean);
+    const slug = slugify(form.title);
 
-    try {
-      const url = editingId
-        ? `/api/admin/articles/${editingId}`
-        : "/api/admin/articles";
-      const method = editingId ? "PUT" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (res.ok) {
-        setMessage(editingId ? "Статья обновлена!" : "Статья создана!");
-        setForm(emptyForm);
-        setEditingId(null);
-        fetchArticles();
-      } else {
-        const data = await res.json();
-        setMessage(data.error || "Ошибка");
-      }
-    } catch {
-      setMessage("Ошибка соединения");
-    } finally {
-      setSaving(false);
+    if (editingId) {
+      const updated = articles.map((a) =>
+        a.id === editingId
+          ? { ...a, ...form, coverImage, tags, slug }
+          : a
+      );
+      setArticles(updated);
+      saveArticles(updated);
+      setMessage("Статья обновлена!");
+    } else {
+      const newArticle: Article = {
+        id: `art-${Date.now()}`,
+        slug,
+        title: form.title,
+        excerpt: form.excerpt,
+        content: form.content,
+        coverImage,
+        category: form.category,
+        tags,
+        date: form.date,
+        isPublished: form.isPublished,
+        isExternal: form.isExternal,
+        externalUrl: form.externalUrl || "",
+      };
+      const updated = [newArticle, ...articles];
+      setArticles(updated);
+      saveArticles(updated);
+      setMessage("Статья создана!");
     }
+
+    setForm(emptyForm);
+    setEditingId(null);
+    setPreviewUrl("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setSaving(false);
   }
 
   function handleEdit(article: Article) {
@@ -169,17 +151,12 @@ export default function AdminPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function handleDelete(id: string) {
+  function handleDelete(id: string) {
     if (!confirm("Удалить статью?")) return;
-
-    const res = await fetch(`/api/admin/articles/${id}`, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
-      setMessage("Статья удалена");
-      fetchArticles();
-    }
+    const updated = articles.filter((a) => a.id !== id);
+    setArticles(updated);
+    saveArticles(updated);
+    setMessage("Статья удалена");
   }
 
   function handleCancel() {
@@ -219,9 +196,7 @@ export default function AdminPage() {
           </h2>
 
           <div>
-            <label className="block text-sm text-text-secondary mb-1.5">
-              Заголовок *
-            </label>
+            <label className="block text-sm text-text-secondary mb-1.5">Заголовок *</label>
             <input
               type="text"
               required
@@ -233,52 +208,42 @@ export default function AdminPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-text-secondary mb-1.5">
-              Описание (для карточки превью)
-            </label>
+            <label className="block text-sm text-text-secondary mb-1.5">Описание</label>
             <textarea
               value={form.excerpt}
               onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
               className="input-base w-full h-20 resize-none"
-              placeholder="Краткое описание до 150 символов"
+              placeholder="Краткое описание"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-text-secondary mb-1.5">
-              Текст статьи *
-            </label>
+            <label className="block text-sm text-text-secondary mb-1.5">Текст статьи *</label>
             <textarea
               required
               value={form.content}
               onChange={(e) => setForm({ ...form, content: e.target.value })}
               className="input-base w-full h-60 resize-y font-mono text-sm"
-              placeholder="Полный текст статьи. Поддерживается Markdown: ## заголовки, **жирный**, *курсив*"
+              placeholder="Markdown: ## заголовки, **жирный**, *курсив*"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                Категория
-              </label>
+              <label className="block text-sm text-text-secondary mb-1.5">Категория</label>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 className="input-base w-full"
               >
                 {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
+                  <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                Дата публикации
-              </label>
+              <label className="block text-sm text-text-secondary mb-1.5">Дата</label>
               <input
                 type="date"
                 value={form.date}
@@ -290,9 +255,7 @@ export default function AdminPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                Теги (через запятую)
-              </label>
+              <label className="block text-sm text-text-secondary mb-1.5">Теги (через запятую)</label>
               <input
                 type="text"
                 value={form.tags}
@@ -303,16 +266,12 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                Обложка статьи
-              </label>
+              <label className="block text-sm text-text-secondary mb-1.5">Обложка</label>
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={form.coverImage}
-                  onChange={(e) =>
-                    setForm({ ...form, coverImage: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
                   className="input-base flex-1"
                   placeholder="/images/news/photo.jpg"
                 />
@@ -321,7 +280,7 @@ export default function AdminPage() {
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    accept="image/*"
                     onChange={handleFileChange}
                     className="hidden"
                   />
@@ -348,9 +307,6 @@ export default function AdminPage() {
                   )}
                 </div>
               )}
-              {uploading && (
-                <p className="text-xs text-bronze mt-1">Загрузка файла...</p>
-              )}
             </div>
           </div>
 
@@ -359,9 +315,7 @@ export default function AdminPage() {
               <input
                 type="checkbox"
                 checked={form.isPublished}
-                onChange={(e) =>
-                  setForm({ ...form, isPublished: e.target.checked })
-                }
+                onChange={(e) => setForm({ ...form, isPublished: e.target.checked })}
                 className="w-4 h-4 accent-[#C9A227]"
               />
               <span className="text-sm text-text-secondary">Опубликована</span>
@@ -371,62 +325,40 @@ export default function AdminPage() {
               <input
                 type="checkbox"
                 checked={form.isExternal}
-                onChange={(e) =>
-                  setForm({ ...form, isExternal: e.target.checked })
-                }
+                onChange={(e) => setForm({ ...form, isExternal: e.target.checked })}
                 className="w-4 h-4 accent-[#C9A227]"
               />
-              <span className="text-sm text-text-secondary">
-                Внешняя ссылка
-              </span>
+              <span className="text-sm text-text-secondary">Внешняя ссылка</span>
             </label>
           </div>
 
           {form.isExternal && (
             <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                Внешняя ссылка (URL)
-              </label>
+              <label className="block text-sm text-text-secondary mb-1.5">URL</label>
               <input
                 type="url"
                 value={form.externalUrl}
-                onChange={(e) =>
-                  setForm({ ...form, externalUrl: e.target.value })
-                }
+                onChange={(e) => setForm({ ...form, externalUrl: e.target.value })}
                 className="input-base w-full"
-                placeholder="https://dzen.ru/a/..."
+                placeholder="https://..."
               />
             </div>
           )}
 
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving} className="btn-primary">
-              {saving
-                ? "Сохранение..."
-                : editingId
-                ? "Обновить"
-                : "Создать статью"}
+              {saving ? "Сохранение..." : editingId ? "Обновить" : "Создать"}
             </button>
             {editingId && (
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="btn-ghost"
-              >
-                Отмена
-              </button>
+              <button type="button" onClick={handleCancel} className="btn-ghost">Отмена</button>
             )}
           </div>
         </form>
 
         <div>
-          <h2 className="font-heading text-lg font-semibold text-text-primary mb-4">
-            Все статьи
-          </h2>
+          <h2 className="font-heading text-lg font-semibold text-text-primary mb-4">Все статьи</h2>
 
-          {loading ? (
-            <p className="text-text-muted text-sm">Загрузка...</p>
-          ) : articles.length === 0 ? (
+          {articles.length === 0 ? (
             <p className="text-text-muted text-sm">Статей пока нет</p>
           ) : (
             <div className="space-y-3">
@@ -444,40 +376,19 @@ export default function AdminPage() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="tag-bronze text-[10px]">
-                        {article.category}
-                      </span>
-                      <span className="text-[10px] text-text-muted">
-                        {article.date}
-                      </span>
+                      <span className="tag-bronze text-[10px]">{article.category}</span>
+                      <span className="text-[10px] text-text-muted">{article.date}</span>
                       {!article.isPublished && (
-                        <span className="text-[10px] text-error">
-                          черновик
-                        </span>
-                      )}
-                      {article.isExternal && (
-                        <span className="text-[10px] text-text-muted">
-                          внешняя
-                        </span>
+                        <span className="text-[10px] text-error">черновик</span>
                       )}
                     </div>
                     <h3 className="font-heading text-sm font-semibold text-text-primary truncate">
                       {article.title}
                     </h3>
-                    <p className="text-xs text-text-muted mt-0.5 truncate">
-                      {article.excerpt}
-                    </p>
+                    <p className="text-xs text-text-muted mt-0.5 truncate">{article.excerpt}</p>
                   </div>
 
                   <div className="flex gap-2 shrink-0">
-                    <a
-                      href={`/news/${article.slug}`}
-                      target="_blank"
-                      rel="noopener"
-                      className="text-xs text-bronze hover:text-bronze-light transition-colors px-2 py-1"
-                    >
-                      Смотреть
-                    </a>
                     <button
                       onClick={() => handleEdit(article)}
                       className="text-xs text-silver hover:text-text-primary transition-colors px-2 py-1"

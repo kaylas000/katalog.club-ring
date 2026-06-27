@@ -270,15 +270,15 @@ export default function AdminPage() {
 
             <div>
               <label className="block text-sm text-text-secondary mb-1.5">Обложка</label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={form.coverImage}
                   onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
-                  className="input-base flex-1"
+                  className="input-base flex-1 min-w-0"
                   placeholder="/images/news/photo.jpg"
                 />
-                <label className="btn-ghost cursor-pointer flex items-center gap-1 text-xs whitespace-nowrap">
+                <label className="btn-ghost cursor-pointer flex items-center justify-center gap-1 text-xs shrink-0">
                   📁 Файл
                   <input
                     ref={fileInputRef}

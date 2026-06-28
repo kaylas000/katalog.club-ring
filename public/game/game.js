@@ -136,10 +136,10 @@ class Boxer {
 
     getAttackBox(type) {
         const f = this.facing;
-        const r = { jab: 55, cross: 65, hook: 58, uppercut: 50 }[type] || 55;
-        const ox = f === 1 ? 10 : -(10 + r);
-        const oy = type === 'uppercut' ? -60 : -50;
-        return { x: this.x + ox, y: this.y + oy, w: r, h: 35 };
+        const r = { jab: 80, cross: 90, hook: 85, uppercut: 75 }[type] || 80;
+        const ox = f === 1 ? 5 : -(5 + r);
+        const oy = type === 'uppercut' ? -65 : -55;
+        return { x: this.x + ox, y: this.y + oy, w: r, h: 45 };
     }
 
     isAttackActive() {
@@ -583,7 +583,7 @@ class AI {
 function startTraining() {
     initAudio();
     G.phase = 'training';
-    G.fighters = [new Boxer(300, 1, null, 'YOU')];
+    G.fighters = [new Boxer(400, 1, null, 'YOU')];
     G.bagHits = 0;
     bag.hp = 100; bag.angle = 0; bag.vel = 0;
     document.getElementById('mainMenu').classList.add('hidden');
@@ -672,7 +672,7 @@ function loop() {
         // Check bag hit
         if (p.state === 'attack' && p.isAttackActive() && !p.hitConnected) {
             const ab = p.getAttackBox(p.anim);
-            const bb = { x: bag.x - 25, y: bag.y - 110, w: 50, h: 120 };
+            const bb = { x: bag.x - 40, y: bag.y - 120, w: 80, h: 130 };
             if (ab.x < bb.x + bb.w && ab.x + ab.w > bb.x && ab.y < bb.y + bb.h && ab.y + ab.h > bb.y) {
                 hitBag(p.anim === 'PunchUp' ? 'uppercut' : p.anim === 'PunchLeft' ? 'hook' : 'cross');
                 addEffect(bag.x, bag.y - 50, p.anim);

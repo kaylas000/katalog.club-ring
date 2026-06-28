@@ -2,17 +2,26 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Boxing</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        html, body {
             background: #0a0a0a;
             font-family: 'Press Start 2P', monospace;
             overflow: hidden;
             width: 100vw;
             height: 100vh;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Desktop */
+        #gameWrap {
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -24,10 +33,14 @@
         }
         canvas {
             display: block;
+            width: 800px;
+            height: 500px;
             border: 3px solid #c8102e;
             border-radius: 4px;
             box-shadow: 0 0 40px rgba(200, 16, 46, 0.3);
         }
+
+        /* Overlays */
         .overlay {
             position: absolute;
             top: 0; left: 0;
@@ -38,124 +51,54 @@
             align-items: center;
             background: rgba(10, 5, 20, 0.95);
             z-index: 10;
-            pointer-events: all;
         }
-        .overlay.hidden { display: none; pointer-events: none; }
-
-        .title {
-            font-size: 32px;
-            color: #c8102e;
-            text-shadow: 3px 3px 0 #000, 0 0 30px rgba(200, 16, 46, 0.5);
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            font-size: 11px;
-            color: #666;
-            margin-bottom: 40px;
-            letter-spacing: 3px;
-        }
-        .logo-tag {
-            font-size: 9px;
-            color: #c8102e;
-            margin-bottom: 15px;
-            letter-spacing: 8px;
-            border: 1px solid #c8102e;
-            padding: 6px 16px;
-        }
+        .overlay.hidden { display: none; }
+        .title { font-size: 28px; color: #c8102e; text-shadow: 3px 3px 0 #000; margin-bottom: 5px; }
+        .subtitle { font-size: 10px; color: #666; margin-bottom: 30px; letter-spacing: 3px; }
+        .logo-tag { font-size: 9px; color: #c8102e; margin-bottom: 12px; letter-spacing: 6px; border: 1px solid #c8102e; padding: 5px 14px; }
 
         .btn {
             font-family: 'Press Start 2P', monospace;
-            font-size: 12px;
-            padding: 14px 36px;
-            margin: 6px;
+            font-size: 11px;
+            padding: 12px 30px;
+            margin: 5px;
             background: transparent;
             border: 2px solid #c8102e;
             color: #fff;
             cursor: pointer;
             transition: all 0.15s;
-            min-width: 300px;
+            min-width: 260px;
             text-align: center;
         }
-        .btn:hover {
-            background: #c8102e;
-            transform: scale(1.03);
-            box-shadow: 0 0 25px rgba(200, 16, 46, 0.5);
-        }
-        .btn.primary {
-            background: #c8102e;
-            font-size: 14px;
-        }
-        .btn.primary:hover { background: #a00d24; }
+        .btn:hover { background: #c8102e; transform: scale(1.03); }
+        .btn.primary { background: #c8102e; font-size: 13px; }
 
-        .diff-row {
-            display: flex;
-            gap: 8px;
-            margin: 15px 0;
-        }
+        .diff-row { display: flex; gap: 6px; margin: 12px 0; }
         .diff-btn {
             font-family: 'Press Start 2P', monospace;
-            font-size: 9px;
-            padding: 8px 16px;
+            font-size: 8px;
+            padding: 6px 14px;
             background: transparent;
             border: 2px solid #333;
             color: #666;
             cursor: pointer;
-            transition: all 0.15s;
         }
-        .diff-btn:hover, .diff-btn.selected {
-            border-color: #c8102e;
-            color: #fff;
-            background: rgba(200, 16, 46, 0.15);
-        }
-
-        .controls-box {
-            position: absolute;
-            bottom: 10px;
-            left: 10px; right: 10px;
-            background: rgba(0,0,0,0.85);
-            border: 1px solid #333;
-            border-radius: 6px;
-            padding: 12px 16px;
-            display: none;
-            z-index: 20;
-        }
-        .controls-box.show { display: block; }
-        .controls-box h3 {
-            font-size: 10px;
-            color: #c8102e;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .ctrl-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px 20px;
-            font-size: 7px;
-            color: #aaa;
-            line-height: 2;
-        }
-        .ctrl-grid .key {
-            color: #c8102e;
-            font-size: 8px;
-        }
-        .ctrl-grid .label {
-            color: #fff;
-        }
+        .diff-btn:hover, .diff-btn.selected { border-color: #c8102e; color: #fff; }
 
         #controlsDisplay {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(0,0,0,0.8);
+            top: 6px;
+            right: 6px;
+            background: rgba(0,0,0,0.85);
             border: 1px solid #444;
             border-radius: 4px;
-            padding: 8px 12px;
-            font-size: 7px;
+            padding: 6px 10px;
+            font-size: 6px;
             color: #aaa;
-            line-height: 2.2;
+            line-height: 2;
             z-index: 15;
         }
-        #controlsDisplay .k { color: #c8102e; font-size: 8px; }
+        #controlsDisplay .k { color: #c8102e; font-size: 7px; }
         #controlsDisplay .t { color: #fff; }
 
         #rotateOverlay {
@@ -169,43 +112,101 @@
             align-items: center;
             flex-direction: column;
         }
-        #rotateOverlay .icon {
-            font-size: 48px;
-            animation: rotatePhone 2s ease-in-out infinite;
-        }
-        #rotateOverlay .text {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 11px;
-            margin-top: 20px;
-            color: #fff;
-            text-align: center;
-            line-height: 2;
-        }
-        @keyframes rotatePhone {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(90deg); }
-        }
+        #rotateOverlay .icon { font-size: 48px; animation: rotPhone 2s ease-in-out infinite; }
+        #rotateOverlay .text { font-family: 'Press Start 2P', monospace; font-size: 11px; margin-top: 20px; color: #fff; text-align: center; line-height: 2; }
+        @keyframes rotPhone { 0%,100% { transform: rotate(0); } 50% { transform: rotate(90deg); } }
 
+        /* Touch Controls - hidden on desktop */
         #touchControls { display: none; }
 
+        /* ===== MOBILE ===== */
         @media (max-width: 850px) {
-            #gameContainer { width: 100vw; height: 100vh; }
-            canvas { width: 100%; height: 100%; border: none; border-radius: 0; }
-            #touchControls { display: flex !important; }
+            body { flex-direction: column; }
+
+            #rotateOverlay { display: none !important; }
+
+            #gameWrap {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 4px;
+                overflow: hidden;
+            }
+            #gameContainer {
+                width: 100%;
+                height: 100%;
+                max-width: 100vw;
+                max-height: none;
+            }
+            canvas {
+                width: 100% !important;
+                height: 100% !important;
+                border: 2px solid #c8102e;
+                border-radius: 0;
+            }
+            .overlay { border-radius: 0; }
+            .title { font-size: 20px; }
+            .subtitle { font-size: 8px; }
+            .btn { font-size: 9px; padding: 10px 20px; min-width: 200px; }
+            .btn.primary { font-size: 10px; }
             #controlsDisplay { display: none !important; }
-            .overlay { font-size: 10px; }
-            .btn { font-size: 10px !important; padding: 10px 20px !important; min-width: 200px !important; }
+
+            /* Touch controls panel */
+            #touchControls {
+                display: flex !important;
+                flex-shrink: 0;
+                width: 100%;
+                height: 120px;
+                padding: 8px 10px;
+                gap: 8px;
+                background: #111;
+                border-top: 2px solid #222;
+                align-items: center;
+                justify-content: space-between;
+                z-index: 20;
+            }
+            .touch-col {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                align-items: center;
+            }
+            .touch-row {
+                display: flex;
+                gap: 6px;
+                align-items: center;
+            }
+            .touch-btn {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                border: 2px solid rgba(255,255,255,0.25);
+                background: rgba(255,255,255,0.08);
+                color: #fff;
+                font-family: 'Press Start 2P', monospace;
+                font-size: 7px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                touch-action: none;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .touch-btn:active, .touch-btn.active {
+                background: rgba(200,16,46,0.5);
+                border-color: #c8102e;
+            }
+            .touch-jab { background: rgba(200,16,46,0.2); }
+            .touch-cross { background: rgba(230,126,34,0.2); }
+            .touch-hook { background: rgba(192,57,43,0.2); }
+            .touch-upper { background: rgba(142,68,173,0.2); }
+            .touch-block { background: rgba(41,128,185,0.2); }
         }
-        @media (max-width: 850px) and (orientation: landscape) {
-            #touchControls { height: 100vh; padding: 50px 8px 8px 8px; }
-            .touch-left { position: absolute; left: 8px; bottom: 10px; flex-direction: column; }
-            .touch-center { position: absolute; left: 72px; bottom: 10px; flex-direction: row; }
-            .touch-right { position: absolute; right: 8px; bottom: 10px; flex-direction: column; }
-            .touch-btn { width: 46px; height: 46px; font-size: 7px; }
-        }
-        @media (max-width: 850px) and (orientation: portrait) {
+
+        /* Portrait on phone - show rotate prompt */
+        @media (max-width: 500px) and (orientation: portrait) {
             #rotateOverlay { display: flex !important; }
-            body > #gameContainer { display: none !important; }
+            #gameWrap, #touchControls { display: none !important; }
         }
     </style>
 </head>
@@ -214,82 +215,66 @@
         <div class="icon">📱</div>
         <div class="text">Поверни телефон<br>на бок</div>
     </div>
-    <div id="gameContainer">
-        <canvas id="gameCanvas" width="800" height="500"></canvas>
 
-        <!-- Main Menu -->
-        <div id="mainMenu" class="overlay">
-            <div class="logo-tag">CLUB RING</div>
-            <div class="title">BOXING</div>
-            <div class="subtitle">CHAMPIONSHIP</div>
+    <div id="gameWrap">
+        <div id="gameContainer">
+            <canvas id="gameCanvas" width="800" height="500"></canvas>
 
-            <button class="btn primary" onclick="startTraining()">TRAINING MODE</button>
-            <button class="btn" onclick="startFight('ai')">VS COMPUTER</button>
-            <button class="btn" onclick="startFight('pvp')">VS PLAYER (2P)</button>
-
-            <div class="diff-row">
-                <button class="diff-btn selected" data-diff="easy">EASY</button>
-                <button class="diff-btn" data-diff="medium">MEDIUM</button>
-                <button class="diff-btn" data-diff="hard">HARD</button>
-            </div>
-
-            <div class="controls-box" id="controlsHelp">
-                <h3>CONTROLS</h3>
-                <div class="ctrl-grid">
-                    <span><span class="key">A/D</span> <span class="label">Move</span></span>
-                    <span><span class="key">Arrows L/R</span> <span class="label">Move P2</span></span>
-                    <span><span class="key">W</span> <span class="label">Jump</span></span>
-                    <span><span class="key">Arrow Up</span> <span class="label">Jump P2</span></span>
-                    <span><span class="key">Q</span> <span class="label">Block</span></span>
-                    <span><span class="key">Shift</span> <span class="label">Block P2</span></span>
-                    <span style="grid-column: span 2; text-align:center; color:#c8102e; margin-top:4px;">--- PUNCHES ---</span>
-                    <span><span class="key">SPACE</span> <span class="label">Jab</span></span>
-                    <span><span class="key">NumPad0</span> <span class="label">Jab P2</span></span>
-                    <span><span class="key">F</span> <span class="label">Cross</span></span>
-                    <span><span class="key">NumPad1</span> <span class="label">Cross P2</span></span>
-                    <span><span class="key">G</span> <span class="label">Hook</span></span>
-                    <span><span class="key">NumPad2</span> <span class="label">Hook P2</span></span>
-                    <span><span class="key">E</span> <span class="label">Uppercut</span></span>
-                    <span><span class="key">NumPad3</span> <span class="label">Uppercut P2</span></span>
-                    <span><span class="key">C</span> <span class="label">Body Shot</span></span>
-                    <span><span class="key">NumPad.</span> <span class="label">Body P2</span></span>
+            <!-- Main Menu -->
+            <div id="mainMenu" class="overlay">
+                <div class="logo-tag">CLUB RING</div>
+                <div class="title">BOXING</div>
+                <div class="subtitle">CHAMPIONSHIP</div>
+                <button class="btn primary" onclick="startTraining()">TRAINING MODE</button>
+                <button class="btn" onclick="startFight('ai')">VS COMPUTER</button>
+                <button class="btn" onclick="startFight('pvp')">VS PLAYER (2P)</button>
+                <div class="diff-row">
+                    <button class="diff-btn selected" data-diff="easy">EASY</button>
+                    <button class="diff-btn" data-diff="medium">MEDIUM</button>
+                    <button class="diff-btn" data-diff="hard">HARD</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Controls overlay during training -->
-        <div id="controlsDisplay">
-            <span class="k">A/D</span> <span class="t">Move</span> &nbsp;
-            <span class="k">W</span> <span class="t">Jump</span> &nbsp;
-            <span class="k">Q</span> <span class="t">Block</span><br>
-            <span class="k">SPACE</span> <span class="t">Jab</span> &nbsp;
-            <span class="k">F</span> <span class="t">Cross</span> &nbsp;
-            <span class="k">G</span> <span class="t">Hook</span><br>
-            <span class="k">E</span> <span class="t">Uppercut</span> &nbsp;
-            <span class="k">C</span> <span class="t">Body</span>
-        </div>
-
-        <!-- Result Screen -->
-        <div id="resultScreen" class="overlay hidden">
-            <div class="title" id="resultTitle">K.O.!</div>
-            <div class="subtitle" id="resultWinner" style="margin-bottom:30px;">PLAYER 1 WINS</div>
-            <button class="btn primary" onclick="showMenu()">MAIN MENU</button>
-            <button class="btn" onclick="startFight(G.mode)">REMATCH</button>
-        </div>
-
-        <!-- Mobile Touch Controls -->
-        <div id="touchControls">
-            <div class="touch-left">
-                <button class="touch-btn touch-move" id="btnLeft">◀</button>
-                <button class="touch-btn touch-move" id="btnRight">▶</button>
+            <!-- Controls overlay (desktop only) -->
+            <div id="controlsDisplay">
+                <span class="k">A/D</span> <span class="t">Move</span> &nbsp;
+                <span class="k">W</span> <span class="t">Jump</span> &nbsp;
+                <span class="k">Q</span> <span class="t">Block</span><br>
+                <span class="k">Space</span> <span class="t">Jab</span> &nbsp;
+                <span class="k">F</span> <span class="t">Cross</span> &nbsp;
+                <span class="k">G</span> <span class="t">Hook</span><br>
+                <span class="k">E</span> <span class="t">Upper</span> &nbsp;
+                <span class="k">C</span> <span class="t">Body</span>
             </div>
-            <div class="touch-center">
-                <button class="touch-btn touch-jump" id="btnJump">▲</button>
+
+            <!-- Result Screen -->
+            <div id="resultScreen" class="overlay hidden">
+                <div class="title" id="resultTitle">K.O.!</div>
+                <div class="subtitle" id="resultWinner" style="margin-bottom:20px;">PLAYER 1 WINS</div>
+                <button class="btn primary" onclick="showMenu()">MAIN MENU</button>
+                <button class="btn" onclick="startFight(G.mode)">REMATCH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Touch Controls (mobile only) -->
+    <div id="touchControls">
+        <div class="touch-col">
+            <div class="touch-row">
+                <button class="touch-btn" id="btnLeft">◀</button>
+                <button class="touch-btn" id="btnRight">▶</button>
+            </div>
+            <div class="touch-row">
+                <button class="touch-btn" id="btnJump">▲</button>
                 <button class="touch-btn touch-block" id="btnBlock">🛡</button>
             </div>
-            <div class="touch-right">
+        </div>
+        <div class="touch-col">
+            <div class="touch-row">
                 <button class="touch-btn touch-jab" id="btnJab">JAB</button>
                 <button class="touch-btn touch-cross" id="btnCross">CROSS</button>
+            </div>
+            <div class="touch-row">
                 <button class="touch-btn touch-hook" id="btnHook">HOOK</button>
                 <button class="touch-btn touch-upper" id="btnUpper">UPPER</button>
             </div>

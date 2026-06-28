@@ -32,7 +32,7 @@ export const mainNavigation: NavItem[] = [
     ],
   },
   { label: "Энциклопедия", href: "/encyclopedia" },
-  { label: "Игра", href: "/game/index.html", external: true },
+  { label: "Игра", href: "/game" },
 ];
 
 export const shopCategories = [

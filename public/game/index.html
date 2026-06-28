@@ -12,19 +12,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0a0a0a;
-            font-family: 'Inter', 'Press Start 2P', monospace;
+            font-family: 'Press Start 2P', monospace;
             overflow: hidden;
             height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
         }
         #gameContainer {
             position: relative;
             width: 800px;
-            height: calc(100vh - 52px);
-            flex: 1;
+            height: 500px;
         }
         canvas {
             display: block;
@@ -192,47 +190,8 @@
 
         #touchControls { display: none; }
 
-        .site-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            height: 52px;
-            background: #111;
-            border-bottom: 1px solid #222;
-            flex-shrink: 0;
-            z-index: 100;
-        }
-        .site-logo {
-            font-family: 'Inter', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: #fff;
-            text-decoration: none;
-            letter-spacing: 1px;
-        }
-        .site-logo span { color: #c8102e; }
-        .site-nav {
-            display: flex;
-            gap: 20px;
-        }
-        .site-nav a {
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            color: #888;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .site-nav a:hover, .site-nav a.active {
-            color: #c8102e;
-        }
         @media (max-width: 850px) {
-            .site-nav { display: none; }
-            .site-header { padding: 0 12px; }
-        }
-
-        @media (max-width: 850px) {
-            #gameContainer { width: 100vw; height: calc(100vh - 52px); }
+            #gameContainer { width: 100vw; height: 100vh; }
             canvas { width: 100%; height: 100%; border: none; border-radius: 0; }
             #touchControls { display: flex !important; }
             #controlsDisplay { display: none !important; }
@@ -253,18 +212,6 @@
     </style>
 </head>
 <body>
-    <div class="site-header">
-        <a href="/" class="site-logo">CLUB-RING</a>
-        <nav class="site-nav">
-            <a href="/">Главная</a>
-            <a href="/trainer">Тренер</a>
-            <a href="/clubs">Залы</a>
-            <a href="/shop">Магазин</a>
-            <a href="/news">Медиа</a>
-            <a href="/encyclopedia">Энциклопедия</a>
-            <a href="/game/index.html" class="active">Игра</a>
-        </nav>
-    </div>
     <div id="rotateOverlay">
         <div class="icon">📱</div>
         <div class="text">Поверни телефон<br>на бок</div>

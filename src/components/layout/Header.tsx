@@ -11,6 +11,7 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const totalItems = useCart((s) => s.items.reduce((sum, i) => sum + i.quantity, 0));
 
@@ -38,6 +39,15 @@ export function Header() {
       clearCloseTimer();
     };
   }, [clearCloseTimer]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   return (
     <header
@@ -68,8 +78,6 @@ export function Header() {
               >
                 <Link
                   href={item.href}
-                  target={item.external ? "_blank" : undefined}
-                  rel={item.external ? "noopener noreferrer" : undefined}
                   className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-text-secondary hover:text-bronze transition-colors"
                 >
                   {item.label}
@@ -109,7 +117,10 @@ export function Header() {
 
             <button
               className="lg:hidden p-2 text-text-secondary hover:text-bronze transition-colors"
-              onClick={() => setMobileOpen(!mobileOpen)}
+              onClick={() => {
+                setMobileOpen(!mobileOpen);
+                setMobileExpanded(null);
+              }}
               aria-label="Меню"
             >
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -119,32 +130,54 @@ export function Header() {
       </div>
 
       {mobileOpen && (
-        <div className="lg:hidden bg-bg-primary border-t border-border">
-          <nav className="max-w-7xl mx-auto px-5 py-6 space-y-1">
+        <div className="lg:hidden bg-bg-primary border-t border-border max-h-[80vh] overflow-y-auto">
+          <nav className="max-w-7xl mx-auto px-5 py-4 space-y-0.5">
             {mainNavigation.map((item) => (
               <div key={item.href}>
-                <Link
-                  href={item.href}
-                  target={item.external ? "_blank" : undefined}
-                  rel={item.external ? "noopener noreferrer" : undefined}
-                  className="block px-4 py-3 text-lg font-medium text-text-secondary hover:text-bronze transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {item.label}
-                </Link>
-                {item.children && (
-                  <div className="pl-8 space-y-1">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        className="block px-4 py-2 text-sm text-text-muted hover:text-bronze transition-colors"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
+                {item.children ? (
+                  <>
+                    <button
+                      onClick={() => setMobileExpanded(mobileExpanded === item.href ? null : item.href)}
+                      className="w-full flex items-center justify-between px-4 py-3 text-lg font-medium text-text-secondary hover:text-bronze transition-colors"
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown
+                        className={cn(
+                          "w-4 h-4 transition-transform duration-200",
+                          mobileExpanded === item.href && "rotate-180"
+                        )}
+                      />
+                    </button>
+                    {mobileExpanded === item.href && (
+                      <div className="pl-6 pb-2 space-y-0.5">
+                        <Link
+                          href={item.href}
+                          className="block px-4 py-2 text-sm text-bronze hover:text-bronze-light transition-colors"
+                          onClick={() => setMobileOpen(false)}
+                        >
+                          Смотреть все →
+                        </Link>
+                        {item.children.map((child) => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className="block px-4 py-2 text-sm text-text-muted hover:text-bronze transition-colors"
+                            onClick={() => setMobileOpen(false)}
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="block px-4 py-3 text-lg font-medium text-text-secondary hover:text-bronze transition-colors"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
                 )}
               </div>
             ))}

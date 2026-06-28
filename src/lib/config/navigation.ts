@@ -31,6 +31,7 @@ export const mainNavigation: NavItem[] = [
     ],
   },
   { label: "Энциклопедия", href: "/encyclopedia" },
+  { label: "Игра", href: "/game" },
 ];
 
 export const shopCategories = [

@@ -552,9 +552,9 @@ const G = {
 // ===== AI =====
 class AI {
     constructor(diff) {
-        this.r = diff === 'easy' ? 30 : diff === 'medium' ? 15 : 6;
-        this.a = diff === 'easy' ? 0.3 : diff === 'medium' ? 0.6 : 0.85;
-        this.b = diff === 'easy' ? 0.1 : diff === 'medium' ? 0.3 : 0.5;
+        this.r = diff === 'easy' ? 20 : diff === 'medium' ? 10 : 4;
+        this.a = diff === 'easy' ? 0.5 : diff === 'medium' ? 0.7 : 0.9;
+        this.b = diff === 'easy' ? 0.15 : diff === 'medium' ? 0.35 : 0.55;
         this.t = 0; this.d = null;
     }
     update(me, op) {
@@ -562,19 +562,24 @@ class AI {
         if (this.t > 0) return this.d;
         const d = Math.abs(me.x - op.x), dx = op.x - me.x;
         const a = { move: 0, punch: null, block: false };
-        if (d < 70) {
-            if (op.state === 'attack' && Math.random() < this.b) a.block = true;
-            else if (Math.random() < this.a) {
+
+        if (d < 85) {
+            if (op.state === 'attack' && Math.random() < this.b) {
+                a.block = true;
+            } else if (Math.random() < this.a) {
                 const r = Math.random();
-                if (r < 0.35) a.punch = 'jab';
+                if (r < 0.3) a.punch = 'jab';
                 else if (r < 0.55) a.punch = 'cross';
-                else if (r < 0.72) a.punch = 'hook';
+                else if (r < 0.75) a.punch = 'hook';
                 else a.punch = 'uppercut';
-            } else a.move = dx > 0 ? -1 : 1;
-        } else if (d < 140) {
-            if (Math.random() < this.a * 0.8) a.move = dx > 0 ? 1 : -1;
-        } else a.move = dx > 0 ? 1 : -1;
-        this.t = this.r + Math.floor(Math.random() * 7);
+            } else {
+                a.move = dx > 0 ? -1 : 1;
+            }
+        } else {
+            a.move = dx > 0 ? 1 : -1;
+        }
+
+        this.t = this.r + Math.floor(Math.random() * 5);
         this.d = a; return a;
     }
 }

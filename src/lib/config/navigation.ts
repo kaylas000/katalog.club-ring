@@ -2,6 +2,7 @@ export interface NavItem {
   label: string;
   href: string;
   children?: NavItem[];
+  external?: boolean;
 }
 
 export const mainNavigation: NavItem[] = [
@@ -31,7 +32,7 @@ export const mainNavigation: NavItem[] = [
     ],
   },
   { label: "Энциклопедия", href: "/encyclopedia" },
-  { label: "Игра", href: "/game" },
+  { label: "Игра", href: "/game/index.html", external: true },
 ];
 
 export const shopCategories = [

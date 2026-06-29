@@ -2,21 +2,28 @@
 
 import { useState, useEffect } from "react";
 
+function isMobile() {
+  if (typeof window === "undefined") return false;
+  return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 850;
+}
+
 export default function GamePage() {
-  const [isLandscape, setIsLandscape] = useState(false);
+  const [isLandscapeMobile, setIsLandscapeMobile] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsLandscape(window.innerWidth > window.innerHeight);
+    const check = () => {
+      setIsLandscapeMobile(isMobile() && window.innerWidth > window.innerHeight);
+    };
     check();
     window.addEventListener("resize", check);
-    window.addEventListener("orientationchange", () => setTimeout(check, 100));
+    window.addEventListener("orientationchange", () => setTimeout(check, 150));
     return () => {
       window.removeEventListener("resize", check);
       window.removeEventListener("orientationchange", check);
     };
   }, []);
 
-  if (isLandscape) {
+  if (isLandscapeMobile) {
     return (
       <div className="fixed inset-0 z-[9999] bg-black">
         <iframe

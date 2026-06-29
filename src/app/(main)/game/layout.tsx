@@ -14,3 +14,7 @@ export const metadata: Metadata = {
     canonical: "https://club-ring.ru/game",
   },
 };
+
+export default function GameLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}

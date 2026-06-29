@@ -16,31 +16,8 @@ const VIDEOS: Video[] = [
   { id: "K7zcXdxPmd0", title: "Подготовка к бою" },
 ];
 
-const PIPED_INSTANCES = [
-  "https://piped.video",
-  "https://piped.kavin.rocks",
-  "https://piped.privacydev.net",
-];
-
-function getProxyUrl(videoId: string) {
-  return `${PIPED_INSTANCES[0]}/watch?v=${videoId}`;
-}
-
-function getThumbnailUrl(videoId: string) {
-  return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
-}
-
 export default function VideosClient() {
   const [playing, setPlaying] = useState<string | null>(null);
-  const [failed, setFailed] = useState<Set<string>>(new Set());
-
-  const handlePlay = (id: string) => {
-    setPlaying(id);
-  };
-
-  const handleError = (id: string) => {
-    setFailed((prev) => new Set(prev).add(id));
-  };
 
   return (
     <div className="min-h-screen">
@@ -66,53 +43,45 @@ export default function VideosClient() {
             <div className="mb-10">
               <button
                 onClick={() => setPlaying(null)}
-                className="mb-4 text-sm text-text-muted hover:text-bronze transition-colors"
+                className="mb-4 px-4 py-2 text-sm bg-bg-card border border-border rounded-lg hover:text-bronze transition-colors"
               >
                 ← Назад к списку
               </button>
               <div className="relative w-full rounded-xl overflow-hidden shadow-2xl bg-black" style={{ paddingBottom: "56.25%" }}>
                 <iframe
-                  src={getProxyUrl(playing)}
+                  src={`https://www.youtube.com/embed/${playing}?autoplay=1&rel=0`}
                   className="absolute inset-0 w-full h-full border-0"
-                  allow="autoplay; encrypted-media"
+                  allow="autoplay; encrypted-media; picture-in-picture"
                   allowFullScreen
+                  title="Видео"
                 />
               </div>
             </div>
           ) : null}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {VIDEOS.map((video) => (
               <div
                 key={video.id}
                 className="group bg-bg-card border border-border rounded-xl overflow-hidden hover:border-bronze/50 transition-all cursor-pointer"
-                onClick={() => handlePlay(video.id)}
+                onClick={() => setPlaying(video.id)}
               >
                 <div className="relative aspect-video bg-bg-elevated">
-                  {failed.has(video.id) ? (
-                    <div className="absolute inset-0 flex items-center justify-center text-text-muted text-sm">
-                      Видео недоступно
+                  <img
+                    src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+                    alt={video.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
+                    <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <svg className="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
                     </div>
-                  ) : (
-                    <>
-                      <img
-                        src={getThumbnailUrl(video.id)}
-                        alt={video.title}
-                        className="w-full h-full object-cover"
-                        onError={() => handleError(video.id)}
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-14 h-14 bg-bronze rounded-full flex items-center justify-center shadow-lg">
-                          <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </div>
-                      </div>
-                    </>
-                  )}
+                  </div>
                 </div>
-                <div className="p-3">
+                <div className="p-4">
                   <h3 className="font-medium text-sm text-text-primary line-clamp-2 group-hover:text-bronze transition-colors">
                     {video.title}
                   </h3>

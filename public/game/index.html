@@ -49,17 +49,17 @@
         #controlsDisplay .k { color: #c8102e; font-size: 7px; }
         #controlsDisplay .t { color: #fff; }
 
+        /* Rotate overlay - only show in standalone mode */
         #rotateOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0a; z-index: 999; justify-content: center; align-items: center; flex-direction: column; }
         #rotateOverlay .icon { font-size: 48px; animation: rotP 2s ease-in-out infinite; }
         #rotateOverlay .text { font-family: 'Press Start 2P', monospace; font-size: 11px; margin-top: 20px; color: #fff; text-align: center; line-height: 2; }
         @keyframes rotP { 0%,100%{transform:rotate(0)} 50%{transform:rotate(90deg)} }
 
-        /* Touch zones - hidden on desktop */
+        /* Touch - hidden on desktop */
         .touch-zone { display: none; }
 
-        /* MOBILE: touch overlays on top of fullscreen canvas */
+        /* Mobile landscape: fullscreen game */
         @media (max-width: 850px) and (orientation: landscape) {
-            #rotateOverlay { display: none !important; }
             #controlsDisplay { display: none !important; }
             .overlay .title { font-size: 18px; }
             .overlay .subtitle { font-size: 8px; }
@@ -98,11 +98,6 @@
             .touch-hook { background: rgba(192,57,43,0.12); }
             .touch-upper { background: rgba(142,68,173,0.12); }
             .touch-block { background: rgba(41,128,185,0.12); }
-        }
-
-        @media (max-width: 500px) and (orientation: portrait) {
-            #rotateOverlay { display: flex !important; }
-            #gameCanvas, .overlay, .touch-zone { display: none !important; }
         }
     </style>
 </head>

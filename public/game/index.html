@@ -69,35 +69,35 @@
             .touch-zone {
                 display: flex !important;
                 position: fixed;
-                top: 0; bottom: 0;
-                width: 80px;
+                bottom: 0;
+                width: auto;
                 z-index: 30;
-                flex-direction: column;
-                justify-content: flex-end;
-                padding: 10px 6px;
-                gap: 6px;
+                flex-direction: row;
+                align-items: flex-end;
+                padding: 0 12px 16px 12px;
+                gap: 8px;
             }
-            .touch-zone.left { left: 0; align-items: flex-start; }
-            .touch-zone.right { right: 0; align-items: flex-end; }
+            .touch-zone.left { left: 0; }
+            .touch-zone.right { right: 0; }
             .touch-btn {
-                width: 44px; height: 44px;
+                width: 64px; height: 64px;
                 border-radius: 50%;
-                border: 2px solid rgba(255,255,255,0.2);
-                background: rgba(255,255,255,0.07);
+                border: 2px solid rgba(255,255,255,0.25);
+                background: rgba(255,255,255,0.08);
                 color: #fff;
                 font-family: 'Press Start 2P', monospace;
-                font-size: 7px;
+                font-size: 9px;
                 display: flex; align-items: center; justify-content: center;
                 touch-action: none;
                 -webkit-tap-highlight-color: transparent;
-                opacity: 0.6;
+                opacity: 0.7;
             }
             .touch-btn:active, .touch-btn.active { background: rgba(200,16,46,0.6); border-color: #c8102e; opacity: 1; }
-            .touch-jab { background: rgba(200,16,46,0.12); }
-            .touch-cross { background: rgba(230,126,34,0.12); }
-            .touch-hook { background: rgba(192,57,43,0.12); }
-            .touch-upper { background: rgba(142,68,173,0.12); }
-            .touch-block { background: rgba(41,128,185,0.12); }
+            .touch-jab { background: rgba(200,16,46,0.15); }
+            .touch-cross { background: rgba(230,126,34,0.15); }
+            .touch-hook { background: rgba(192,57,43,0.15); }
+            .touch-upper { background: rgba(142,68,173,0.15); }
+            .touch-block { background: rgba(41,128,185,0.15); }
         }
     </style>
 </head>
@@ -141,7 +141,7 @@
         <button class="btn" onclick="startFight(G.mode)">REMATCH</button>
     </div>
 
-    <!-- TOUCH LEFT: movement -->
+    <!-- TOUCH LEFT: movement + block (bottom-left corner for left thumb) -->
     <div class="touch-zone left">
         <button class="touch-btn" id="btnLeft">◀</button>
         <button class="touch-btn" id="btnRight">▶</button>
@@ -149,12 +149,12 @@
         <button class="touch-btn touch-block" id="btnBlock">🛡</button>
     </div>
 
-    <!-- TOUCH RIGHT: punches -->
+    <!-- TOUCH RIGHT: punches (bottom-right corner for right thumb) -->
     <div class="touch-zone right">
-        <button class="touch-btn touch-jab" id="btnJab">JAB</button>
-        <button class="touch-btn touch-cross" id="btnCross">CRS</button>
-        <button class="touch-btn touch-hook" id="btnHook">HK</button>
         <button class="touch-btn touch-upper" id="btnUpper">UP</button>
+        <button class="touch-btn touch-hook" id="btnHook">HK</button>
+        <button class="touch-btn touch-cross" id="btnCross">CRS</button>
+        <button class="touch-btn touch-jab" id="btnJab">JAB</button>
     </div>
 
     <script src="game.js"></script>

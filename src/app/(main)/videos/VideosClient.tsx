@@ -55,6 +55,11 @@ export default function VideosClient() {
 
   const handleBack = useCallback(() => setPlaying(null), []);
 
+  const handlePlay = useCallback((id: string) => {
+    setPlaying(id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   return (
     <div className="min-h-screen">
       <section className="bg-bg-secondary py-8">
@@ -84,7 +89,7 @@ export default function VideosClient() {
               <div
                 key={video.id}
                 className="group bg-bg-card border border-border rounded-xl overflow-hidden hover:border-bronze/50 transition-all cursor-pointer"
-                onClick={() => setPlaying(video.id)}
+                onClick={() => handlePlay(video.id)}
               >
                 <div className="relative w-full" style={{ aspectRatio: "9/16" }}>
                   <img

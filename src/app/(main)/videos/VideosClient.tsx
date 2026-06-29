@@ -46,6 +46,7 @@ function VideoCard({ video, onPlay }: { video: Video; onPlay: (id: string) => vo
                 alt={video.title}
                 className="w-full h-full object-cover"
                 loading="lazy"
+                referrerPolicy="no-referrer"
               />
             ) : (
               <div className="w-full h-full bg-bg-elevated flex items-center justify-center">

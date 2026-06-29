@@ -5,16 +5,17 @@ import { useState } from "react";
 interface Video {
   id: string;
   title: string;
+  file: string;
   thumb: string;
 }
 
 const VIDEOS: Video[] = [
-  { id: "e1aa94c5ef97ee970a5cf5943f9e6a14", title: "Холифилд против Джеймса Томи", thumb: "/videos/thumb-1.jpg" },
-  { id: "a22482521a049e6ce7db0a0231d0adbb", title: "Джеймс Тони против Василия Жирова", thumb: "/videos/thumb-2.jpg" },
-  { id: "822c3c55211fe5e00427b510ba1a802b", title: "Льюис - Холифилд", thumb: "/videos/thumb-3.jpg" },
-  { id: "2e2e59a2b49c2659c669349f9dab4fef", title: "Мясорубка по правилам бокса", thumb: "/videos/thumb-4.jpg" },
-  { id: "33e490aab1cb92981cef5239eda24060", title: "Бой столетия #бокс #тайсон", thumb: "/videos/thumb-5.jpg" },
-  { id: "1dd39fb0ff9eec5d9f0577d6b2cb0292", title: "Форман чемпион #бокс", thumb: "/videos/thumb-6.jpg" },
+  { id: "1", title: "Холифилд против Джеймса Томи", file: "/videos/boxing-1.mp4", thumb: "/videos/thumb-1.jpg" },
+  { id: "2", title: "Джеймс Тони против Василия Жирова", file: "/videos/boxing-2.mp4", thumb: "/videos/thumb-2.jpg" },
+  { id: "3", title: "Льюис - Холифилд", file: "/videos/boxing-3.mp4", thumb: "/videos/thumb-3.jpg" },
+  { id: "4", title: "Мясорубка по правилам бокса", file: "/videos/boxing-4.mp4", thumb: "/videos/thumb-4.jpg" },
+  { id: "5", title: "Бой столетия #бокс #тайсон", file: "/videos/boxing-5.mp4", thumb: "/videos/thumb-5.jpg" },
+  { id: "6", title: "Форман чемпион #бокс", file: "/videos/boxing-6.mp4", thumb: "/videos/thumb-6.jpg" },
 ];
 
 export default function VideosClient() {
@@ -50,12 +51,13 @@ export default function VideosClient() {
                 ← Назад к списку
               </button>
               <div className="mx-auto max-w-lg">
-                <div className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "177.8%" }}>
-                  <iframe
-                    src={`https://rutube.ru/play/embed/${currentVideo.id}`}
-                    className="absolute inset-0 w-full h-full border-0"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
+                <div className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl">
+                  <video
+                    src={currentVideo.file}
+                    controls
+                    autoPlay
+                    className="w-full"
+                    style={{ maxHeight: "70vh" }}
                   />
                 </div>
                 <h2 className="mt-4 text-lg font-bold text-text-primary">{currentVideo.title}</h2>

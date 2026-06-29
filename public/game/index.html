@@ -58,46 +58,59 @@
         /* Touch - hidden on desktop */
         .touch-zone { display: none; }
 
-        /* Mobile landscape: fullscreen game */
+        /* Mobile landscape: game center + buttons on sides */
         @media (max-width: 850px) and (orientation: landscape) {
+            body { display: flex; flex-direction: row; }
+            #rotateOverlay { display: none !important; }
             #controlsDisplay { display: none !important; }
             .overlay .title { font-size: 18px; }
             .overlay .subtitle { font-size: 8px; }
-            .overlay .btn { font-size: 9px; padding: 8px 20px; min-width: 180px; }
+            .overlay .btn { font-size: 9px; padding: 8px 16px; min-width: 160px; }
             .overlay .btn.primary { font-size: 10px; }
+
+            #gameCanvas {
+                position: static;
+                width: auto;
+                height: 100vh;
+                flex: 1;
+                border: none;
+                border-radius: 0;
+            }
 
             .touch-zone {
                 display: flex !important;
-                position: fixed;
-                bottom: 0;
-                width: auto;
+                width: 80px;
+                height: 100vh;
                 z-index: 30;
-                flex-direction: row;
-                align-items: flex-end;
-                padding: 0 12px 16px 12px;
-                gap: 8px;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 10px 4px;
+                gap: 10px;
+                background: rgba(0,0,0,0.5);
             }
-            .touch-zone.left { left: 0; }
-            .touch-zone.right { right: 0; }
+            .touch-zone.left { order: -1; }
+            .touch-zone.right { order: 1; }
+
             .touch-btn {
-                width: 64px; height: 64px;
+                width: 58px; height: 58px;
                 border-radius: 50%;
-                border: 2px solid rgba(255,255,255,0.25);
-                background: rgba(255,255,255,0.08);
+                border: 2px solid rgba(255,255,255,0.3);
+                background: rgba(255,255,255,0.1);
                 color: #fff;
                 font-family: 'Press Start 2P', monospace;
-                font-size: 9px;
+                font-size: 8px;
                 display: flex; align-items: center; justify-content: center;
                 touch-action: none;
                 -webkit-tap-highlight-color: transparent;
-                opacity: 0.7;
+                flex-shrink: 0;
             }
-            .touch-btn:active, .touch-btn.active { background: rgba(200,16,46,0.6); border-color: #c8102e; opacity: 1; }
-            .touch-jab { background: rgba(200,16,46,0.15); }
-            .touch-cross { background: rgba(230,126,34,0.15); }
-            .touch-hook { background: rgba(192,57,43,0.15); }
-            .touch-upper { background: rgba(142,68,173,0.15); }
-            .touch-block { background: rgba(41,128,185,0.15); }
+            .touch-btn:active, .touch-btn.active { background: rgba(200,16,46,0.6); border-color: #c8102e; }
+            .touch-jab { background: rgba(200,16,46,0.2); }
+            .touch-cross { background: rgba(230,126,34,0.2); }
+            .touch-hook { background: rgba(192,57,43,0.2); }
+            .touch-upper { background: rgba(142,68,173,0.2); }
+            .touch-block { background: rgba(41,128,185,0.2); }
         }
     </style>
 </head>
@@ -141,20 +154,20 @@
         <button class="btn" onclick="startFight(G.mode)">REMATCH</button>
     </div>
 
-    <!-- TOUCH LEFT: movement + block (bottom-left corner for left thumb) -->
+    <!-- TOUCH LEFT: movement (left side of screen) -->
     <div class="touch-zone left">
+        <button class="touch-btn" id="btnJump">▲</button>
         <button class="touch-btn" id="btnLeft">◀</button>
         <button class="touch-btn" id="btnRight">▶</button>
-        <button class="touch-btn" id="btnJump">▲</button>
         <button class="touch-btn touch-block" id="btnBlock">🛡</button>
     </div>
 
-    <!-- TOUCH RIGHT: punches (bottom-right corner for right thumb) -->
+    <!-- TOUCH RIGHT: punches (right side of screen) -->
     <div class="touch-zone right">
-        <button class="touch-btn touch-upper" id="btnUpper">UP</button>
-        <button class="touch-btn touch-hook" id="btnHook">HK</button>
-        <button class="touch-btn touch-cross" id="btnCross">CRS</button>
         <button class="touch-btn touch-jab" id="btnJab">JAB</button>
+        <button class="touch-btn touch-cross" id="btnCross">CRS</button>
+        <button class="touch-btn touch-hook" id="btnHook">HK</button>
+        <button class="touch-btn touch-upper" id="btnUpper">UP</button>
     </div>
 
     <script src="game.js"></script>

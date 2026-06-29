@@ -16,6 +16,12 @@ const VIDEOS: Video[] = [
   { id: "4", rutubeId: "2e2e59a2b49c2659c669349f9dab4fef", title: "Мясорубка по правилам бокса", thumb: "/videos/thumb-4.jpg" },
   { id: "5", rutubeId: "33e490aab1cb92981cef5239eda24060", title: "Бой столетия", thumb: "/videos/thumb-5.jpg" },
   { id: "6", rutubeId: "1dd39fb0ff9eec5d9f0577d6b2cb0292", title: "Форман чемпион", thumb: "/videos/thumb-6.jpg" },
+  { id: "7", rutubeId: "9998178fc4c4dd5b478f0c810db12740", title: "Льюис - Рахман реванш", thumb: "/videos/thumb-7.jpg" },
+  { id: "8", rutubeId: "1f2ab7ebcfbdf63910a8295f63adc7da", title: "Заб Джуда про бой с Константин Цзю", thumb: "/videos/thumb-8.jpg" },
+  { id: "9", rutubeId: "6d278100eddf452d61857b152314d460", title: "Бой нокаутёров", thumb: "/videos/thumb-9.jpg" },
+  { id: "10", rutubeId: "731948229421945ec1901d78f9cfb2c5", title: "Я в шлеме и мне 47 лет", thumb: "/videos/thumb-10.jpg" },
+  { id: "11", rutubeId: "7cb2d440d2fd780a8a8bff19cc762c2c", title: "Открытый Ринг. Синему 49 лет а красному 38", thumb: "/videos/thumb-11.jpg" },
+  { id: "12", rutubeId: "3551cd9f677f2a282c4f1dc825af920f", title: "Джеймс Тони виртуоз", thumb: "/videos/thumb-12.jpg" },
 ];
 
 function VideoPlayer({ video, onBack }: { video: Video; onBack: () => void }) {

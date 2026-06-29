@@ -8,8 +8,12 @@ interface Video {
 }
 
 const VIDEOS: Video[] = [
-  // Скинь ID видео сюда в формате: { id: "XXXXXXX", title: "Название" }
-  { id: "dQw4w9WgXcQ", title: "Загрузка..." },
+  { id: "dXETqcccS-A", title: "Боксёрская тренировка" },
+  { id: "R7OMd_fK5Oc", title: "Удары и техника" },
+  { id: "aNHmNlB7qk0", title: "Спарринг" },
+  { id: "B0g0CDwKpR8", title: "Тренировка в зале" },
+  { id: "9qKxCPwW0eM", title: "Боксёрские комбинации" },
+  { id: "K7zcXdxPmd0", title: "Подготовка к бою" },
 ];
 
 const PIPED_INSTANCES = [

@@ -37,7 +37,7 @@ export default function GamePage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-y-auto pb-16">
       <section className="bg-bg-secondary py-8">
         <div className="max-w-5xl mx-auto px-5">
           <nav className="text-sm text-text-muted mb-6">

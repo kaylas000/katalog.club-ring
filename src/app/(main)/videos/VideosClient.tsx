@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 
 interface Video {
   id: string;
@@ -9,50 +9,13 @@ interface Video {
 }
 
 const VIDEOS: Video[] = [
-  { id: "e1aa94c5ef97ee970a5cf5943f9e6a14", title: "Холифилд против Джеймса Томи", thumb: "https://preview.rutube.ru/preview/e1aa94c5ef97ee970a5cf5943f9e6a14.webp" },
-  { id: "a22482521a049e6ce7db0a0231d0adbb", title: "Джеймс Тони против Василия Жирова", thumb: "https://preview.rutube.ru/preview/a22482521a049e6ce7db0a0231d0adbb.webp" },
-  { id: "822c3c55211fe5e00427b510ba1a802b", title: "Льюис - Холифилд", thumb: "https://preview.rutube.ru/preview/822c3c55211fe5e00427b510ba1a802b.webp" },
-  { id: "2e2e59a2b49c2659c669349f9dab4fef", title: "Мясорубка по правилам бокса", thumb: "https://preview.rutube.ru/preview/2e2e59a2b49c2659c669349f9dab4fef.webp" },
-  { id: "33e490aab1cb92981cef5239eda24060", title: "Бой столетия #бокс #тайсон", thumb: "https://preview.rutube.ru/preview/33e490aab1cb92981cef5239eda24060.webp" },
-  { id: "1dd39fb0ff9eec5d9f0577d6b2cb0292", title: "Форман чемпион #бокс", thumb: "https://preview.rutube.ru/preview/1dd39fb0ff9eec5d9f0577d6b2cb0292.webp" },
+  { id: "e1aa94c5ef97ee970a5cf5943f9e6a14", title: "Холифилд против Джеймса Томи", thumb: "/videos/thumb-1.jpg" },
+  { id: "a22482521a049e6ce7db0a0231d0adbb", title: "Джеймс Тони против Василия Жирова", thumb: "/videos/thumb-2.jpg" },
+  { id: "822c3c55211fe5e00427b510ba1a802b", title: "Льюис - Холифилд", thumb: "/videos/thumb-3.jpg" },
+  { id: "2e2e59a2b49c2659c669349f9dab4fef", title: "Мясорубка по правилам бокса", thumb: "/videos/thumb-4.jpg" },
+  { id: "33e490aab1cb92981cef5239eda24060", title: "Бой столетия #бокс #тайсон", thumb: "/videos/thumb-5.jpg" },
+  { id: "1dd39fb0ff9eec5d9f0577d6b2cb0292", title: "Форман чемпион #бокс", thumb: "/videos/thumb-6.jpg" },
 ];
-
-function VideoCard({ video, onPlay }: { video: Video; onPlay: (id: string) => void }) {
-  return (
-    <div
-      className="group bg-bg-card border border-border rounded-xl overflow-hidden hover:border-bronze/50 transition-all cursor-pointer"
-      onClick={() => onPlay(video.id)}
-    >
-      <div className="relative w-full" style={{ aspectRatio: "9/16" }}>
-        {video.thumb ? (
-          <img
-            src={video.thumb}
-            alt={video.title}
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-            crossOrigin="anonymous"
-          />
-        ) : (
-          <div className="w-full h-full bg-bg-elevated flex items-center justify-center">
-            <svg className="w-10 h-10 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-          </div>
-        )}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/30 transition-colors">
-          <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-            <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-          <h3 className="font-medium text-xs text-white line-clamp-2">{video.title}</h3>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function VideosClient() {
   const [playing, setPlaying] = useState<string | null>(null);
@@ -89,7 +52,7 @@ export default function VideosClient() {
               <div className="mx-auto max-w-lg">
                 <div className="relative w-full bg-black rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "177.8%" }}>
                   <iframe
-                    src={currentVideo.embedUrl}
+                    src={`https://rutube.ru/play/embed/${currentVideo.id}`}
                     className="absolute inset-0 w-full h-full border-0"
                     allow="autoplay; encrypted-media"
                     allowFullScreen
@@ -102,7 +65,30 @@ export default function VideosClient() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {VIDEOS.map((video) => (
-              <VideoCard key={video.id} video={video} onPlay={setPlaying} />
+              <div
+                key={video.id}
+                className="group bg-bg-card border border-border rounded-xl overflow-hidden hover:border-bronze/50 transition-all cursor-pointer"
+                onClick={() => setPlaying(video.id)}
+              >
+                <div className="relative w-full" style={{ aspectRatio: "9/16" }}>
+                  <img
+                    src={video.thumb}
+                    alt={video.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/30 transition-colors">
+                    <div className="w-14 h-14 bg-red-600 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                    <h3 className="font-medium text-xs text-white line-clamp-2">{video.title}</h3>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>

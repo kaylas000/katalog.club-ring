@@ -29,6 +29,7 @@ const footerSections = [
       { label: "О нас", href: "/about" },
       { label: "Контакты", href: "/contact" },
       { label: "Сотрудничество", href: "/cooperation" },
+      { label: "Игра", href: "/game" },
     ],
   },
 ];

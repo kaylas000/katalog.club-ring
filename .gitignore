@@ -39,7 +39,7 @@ next-env.d.ts
 *.log
 
 # large media
-*.mp4
+# *.mp4
 
 # test
 test-screenshot.mjs

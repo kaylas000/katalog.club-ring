@@ -46,13 +46,10 @@ export interface PricingPlan {
 }
 
 export type ClubTag =
-  | "children"
-  | "women"
-  | "professional"
-  | "amateur"
-  | "muay-thai"
-  | "kickboxing"
-  | "mma"
-  | "fitness-boxing"
-  | "sparring"
-  | "championship";
+  | "бокс"
+  | "дети"
+  | "женщины"
+  | "любитель"
+  | "профессионал"
+  | "фитнес-бокс"
+  | "фитнес";

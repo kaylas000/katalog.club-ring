@@ -29,12 +29,12 @@ export interface Trainer {
 }
 
 export type TrainerSpecialization =
-  | "children"
-  | "adults"
-  | "women"
-  | "professional"
-  | "amateur"
-  | "fitness";
+  | "дети"
+  | "взрослые"
+  | "женщины"
+  | "профессионал"
+  | "любитель"
+  | "фитнес";
 
 export interface Achievement {
   year: number;

@@ -66,7 +66,7 @@ export const clubs: Club[] = [
       { name: "Абонемент 1 месяц (отец+ребёнок)", price: 3000, currency: "RUB", period: "month", features: ["2 абонемента", "Семейная скидка"] },
       { name: "\"Приведи друга\"", price: 200, currency: "RUB", period: "month", features: ["Скидка 20% на следующий месяц", "Для обоих"] },
     ],
-    tags: ["любитель", "дети", "женщины", "профессионалы"],
+    tags: ["любитель", "дети", "женщины", "профессионал"],
     trainerIds: ["trainer-007"],
     rating: 4.2,
     reviewCount: 9,
@@ -289,7 +289,7 @@ export const clubs: Club[] = [
     pricing: [
       { name: "Абонемент 1 месяц", price: 3000, currency: "RUB", period: "month", features: ["Групповые тренировки"] },
     ],
-    tags: ["профессионалы", "дети", "любитель"],
+    tags: ["профессионал", "дети", "любитель"],
     trainerIds: ["trainer-033"],
     rating: 4.5,
     reviewCount: 24,

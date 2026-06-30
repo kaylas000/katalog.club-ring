@@ -11,16 +11,13 @@ interface ClubFiltersProps {
 const countries = ["Все", "Россия", "Казахстан", "Беларусь", "Узбекистан", "Азербайджан"];
 
 const tagLabels: Record<ClubTag, string> = {
-  children: "Дети",
-  women: "Женщины",
-  professional: "Профи",
-  amateur: "Любители",
-  "muay-thai": "Муай-тай",
-  kickboxing: "Кикбоксинг",
-  mma: "ММА",
-  "fitness-boxing": "Фитнес-бокс",
-  sparring: "Спарринги",
-  championship: "Чемпионаты",
+  бокс: "Бокс",
+  дети: "Дети",
+  женщины: "Женщины",
+  любитель: "Любители",
+  "профессионал": "Профи",
+  "фитнес-бокс": "Фитнес-бокс",
+  фитнес: "Фитнес",
 };
 
 const sortOptions = [

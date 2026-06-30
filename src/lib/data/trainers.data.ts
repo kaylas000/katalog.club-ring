@@ -80,7 +80,7 @@ export const trainers: Trainer[] = [
     city: "Пенза",
     country: "Россия",
     clubIds: ["club-013"],
-    bio: "Тренер спортивного клуба Nosorog. Бокс, кикбоксинг, ММА. Тренировки для всех уровней подготовки.",
+    bio: "Тренер спортивного клуба Nosorog. Бокс, ММА. Тренировки для всех уровней подготовки.",
     specializations: ["любитель", "взрослые"],
     sportAchievements: [],
     coachingAchievements: [],

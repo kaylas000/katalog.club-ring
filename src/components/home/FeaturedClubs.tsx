@@ -4,18 +4,6 @@ import { clubs } from "@/lib/data/clubs.data";
 import { formatPrice } from "@/lib/utils/formatters";
 import { ClubCardPhoto } from "@/components/clubs/ClubCardPhoto";
 
-const tagLabels: Record<string, string> = {
-  children: "Дети",
-  women: "Женщины",
-  professional: "Профи",
-  amateur: "Любители",
-  "muay-thai": "Муай-тай",
-  kickboxing: "Кикбоксинг",
-  mma: "ММА",
-  "fitness-boxing": "Фитнес-бокс",
-  sparring: "Спарринги",
-  championship: "Чемпионаты",
-};
 
 export function FeaturedClubs() {
   const featured = clubs.filter((c) => c.isFeatured).slice(0, 6);
@@ -68,7 +56,7 @@ export function FeaturedClubs() {
                   <div className="flex flex-col min-w-0">
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-bg-elevated text-text-secondary border border-border">
-                        {tagLabels[club.tags[0]] || club.tags[0] || "Бокс"}
+                        {club.tags[0] || "Бокс"}
                       </span>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-success/15 text-success border border-success/25">
                         {club.city}
@@ -141,7 +129,7 @@ export function FeaturedClubs() {
               <div className="p-4">
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-bg-elevated text-text-secondary border border-border">
-                    {tagLabels[club.tags[0]] || club.tags[0] || "Бокс"}
+                    {club.tags[0] || "Бокс"}
                   </span>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-success/15 text-success border border-success/25">
                     {club.city}

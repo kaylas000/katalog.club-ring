@@ -2,7 +2,6 @@
 
 import { useState, useMemo, Fragment } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Search, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { clubs } from "@/lib/data/clubs.data";
@@ -10,7 +9,6 @@ import { formatPrice } from "@/lib/utils/formatters";
 import { CityAutocomplete } from "@/components/clubs/CityAutocomplete";
 import { ClubCardPhoto } from "@/components/clubs/ClubCardPhoto";
 import { getLocationById } from "@/lib/data/locations.data";
-import { useLocationStore } from "@/lib/store/location";
 
 const sortOptions = [
   { value: "rating", label: "По рейтингу" },
@@ -20,17 +18,13 @@ const sortOptions = [
 ];
 
 export default function ClubsPageClient() {
-  const router = useRouter();
   const [search, setSearch] = useState("");
+  const [locationId, setLocationId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState("rating");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { locationId, cityLabel } = useLocationStore();
 
   const handleLocationChange = (id: number | null) => {
-    const loc = id ? getLocationById(id) : null;
-    if (loc) {
-      router.push(`/clubs/${encodeURIComponent(loc.label)}`);
-    }
+    setLocationId(id);
   };
 
   const filtered = useMemo(() => {
@@ -82,8 +76,8 @@ export default function ClubsPageClient() {
 
   const reset = () => {
     setSearch("");
+    setLocationId(null);
     setSortBy("rating");
-    router.push("/clubs");
   };
 
   return (
@@ -96,7 +90,7 @@ export default function ClubsPageClient() {
             <span className="text-text-secondary">Залы</span>
           </nav>
           <h1 className="font-heading text-2xl lg:text-3xl font-bold text-text-primary mb-1">
-            Боксёрские залы {cityLabel || "России"}
+            Боксёрские залы России
           </h1>
           <p className="text-sm text-text-secondary">
             {filtered.length} клубов

@@ -146,7 +146,7 @@ export const clubs: Club[] = [
     coordinates: { lat: 53.195, lng: 45.001 },
     phone: "+7 (964) 868-98-38",
     socials: {},
-    photos: ["/images/clubs/nosorog-1.jpg", "/images/clubs/nosorog-2.jpg", "/images/clubs/nosorog-3.jpg", "/images/clubs/nosorog-4.jpg", "/images/clubs/nosorog-5.jpg", "/images/clubs/nosorog-6.jpg"],
+    photos: ["/images/clubs/nosorog-1.jpg", "/images/clubs/nosorog-2.jpg", "/images/clubs/nosorog-3.jpg", "/images/clubs/nosorog-5.jpg", "/images/clubs/nosorog-6.jpg"],
     coverPhoto: "/images/clubs/nosorog-cover.jpg",
     schedule: [
       { day: "mon", sessions: [
@@ -199,7 +199,7 @@ export const clubs: Club[] = [
     coordinates: { lat: 53.185, lng: 44.995 },
     phone: "+7 (987) 511-26-20",
     socials: {},
-    photos: ["/images/clubs/fitnes-boxing-1.jpg", "/images/clubs/fitnes-boxing-2.jpg", "/images/clubs/fitnes-boxing-3.jpg", "/images/clubs/fitnes-boxing-4.jpg", "/images/clubs/fitnes-boxing-5.jpg", "/images/clubs/fitnes-boxing-6.jpg"],
+    photos: ["/images/clubs/fitnes-boxing-1.jpg", "/images/clubs/fitnes-boxing-2.jpg", "/images/clubs/fitnes-boxing-4.jpg", "/images/clubs/fitnes-boxing-5.jpg", "/images/clubs/fitnes-boxing-6.jpg"],
     coverPhoto: "/images/clubs/fitnes-boxing-cover.jpg",
     schedule: [
       { day: "mon", sessions: [

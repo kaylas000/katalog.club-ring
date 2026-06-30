@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import VideosClient from "./VideosClient";
 
 export const metadata: Metadata = {
-  title: "Видеотека — лучшие видео о боксе | Club-Ring",
+  title: "Видеотека — лучшие видео о боксе",
   description: "Видео о боксе: тренировки, техника ударов, разборы боёв, советы тренеров. Смотрите прямо на сайте без перехода на YouTube.",
   keywords: ["видео бокс", "бокс тренировка видео", "техника бокса", "boxing video", "бокс онлайн"],
   openGraph: {

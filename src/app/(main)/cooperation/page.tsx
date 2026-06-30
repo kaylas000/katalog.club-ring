@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Сотрудничество | Club-Ring",
+  title: "Сотрудничество",
   description: "Предложите сотрудничество проекту Club-Ring.",
 };
 

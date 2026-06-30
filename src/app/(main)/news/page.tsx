@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getAllArticles } from "@/lib/data/articles.data";
 
 export const metadata: Metadata = {
-  title: "Статьи и Блог о Боксе | Club-Ring",
+  title: "Статьи и Блог о Боксе",
   description:
     "📝 Блог Club-Ring — статьи о боксе, анализ боев, истории великих боксёров. Новости мира бокса.",
 };

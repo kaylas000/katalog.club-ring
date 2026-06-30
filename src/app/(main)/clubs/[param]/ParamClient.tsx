@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useMemo, Fragment } from "react";
+import { useState, useMemo, Fragment, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Search, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { clubs } from "@/lib/data/clubs.data";
 import { formatPrice } from "@/lib/utils/formatters";
 import { CityAutocomplete } from "@/components/clubs/CityAutocomplete";
 import { ClubCardPhoto } from "@/components/clubs/ClubCardPhoto";
-import { getLocationById } from "@/lib/data/locations.data";
+import { type Location } from "@/lib/data/locations.data";
 import { useLocationStore } from "@/lib/store/location";
 
 const sortOptions = [
@@ -19,30 +18,31 @@ const sortOptions = [
   { value: "newest", label: "По дате" },
 ];
 
-export default function ClubsPageClient() {
-  const router = useRouter();
+interface ParamClientProps {
+  location: Location;
+}
+
+export default function ParamClient({ location }: ParamClientProps) {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("rating");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { locationId, cityLabel } = useLocationStore();
+  const { setLocation } = useLocationStore();
 
-  const handleLocationChange = (id: number | null) => {
-    const loc = id ? getLocationById(id) : null;
-    if (loc) {
-      router.push(`/clubs/${encodeURIComponent(loc.label)}`);
-    }
-  };
+  useEffect(() => {
+    setLocation(location.id, location.label);
+  }, [location, setLocation]);
 
   const filtered = useMemo(() => {
     let result = [...clubs];
 
-    if (locationId) {
-      const loc = getLocationById(locationId);
-      if (loc && loc.kind === "city") {
-        result = result.filter(
-          (c) => c.city.toLowerCase() === loc.label.toLowerCase()
-        );
-      }
+    if (location.kind === "city") {
+      result = result.filter(
+        (c) => c.city.toLowerCase() === location.label.toLowerCase()
+      );
+    } else if (location.kind === "region") {
+      result = result.filter(
+        (c) => c.city.toLowerCase().includes(location.label.toLowerCase().replace("область", "").trim())
+      );
     }
 
     if (search) {
@@ -74,16 +74,13 @@ export default function ClubsPageClient() {
     }
 
     return result;
-  }, [search, locationId, sortBy]);
+  }, [search, sortBy, location]);
 
-  const activeCount =
-    (search ? 1 : 0) +
-    (locationId ? 1 : 0);
+  const activeCount = search ? 1 : 0;
 
   const reset = () => {
     setSearch("");
     setSortBy("rating");
-    router.push("/clubs");
   };
 
   return (
@@ -93,10 +90,12 @@ export default function ClubsPageClient() {
           <nav className="text-sm text-text-muted mb-4">
             <Link href="/" className="hover:text-bronze transition-colors">Главная</Link>
             <span className="mx-2">/</span>
-            <span className="text-text-secondary">Залы</span>
+            <Link href="/clubs" className="hover:text-bronze transition-colors">Залы</Link>
+            <span className="mx-2">/</span>
+            <span className="text-text-secondary">{location.label}</span>
           </nav>
           <h1 className="font-heading text-2xl lg:text-3xl font-bold text-text-primary mb-1">
-            Боксёрские залы {cityLabel || "России"}
+            Боксёрские залы {location.label}
           </h1>
           <p className="text-sm text-text-secondary">
             {filtered.length} клубов
@@ -109,9 +108,9 @@ export default function ClubsPageClient() {
           <div className="hidden lg:flex items-center gap-3">
             <div className="relative min-w-[220px]">
               <CityAutocomplete
-                value={locationId}
-                onChange={handleLocationChange}
-                placeholder="Где? (город или регион)..."
+                value={null}
+                onChange={() => {}}
+                placeholder={location.label}
               />
             </div>
 
@@ -167,14 +166,6 @@ export default function ClubsPageClient() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="input-base pl-9 w-full text-sm"
-                  />
-                </div>
-
-                <div>
-                  <CityAutocomplete
-                    value={locationId}
-                    onChange={handleLocationChange}
-                    placeholder="Город или регион..."
                   />
                 </div>
 
@@ -245,11 +236,6 @@ export default function ClubsPageClient() {
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-success/15 text-success border border-success/25">
                               {club.city}
                             </span>
-                            {club.isVerified && (
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-success/15 text-success border border-success/25">
-                                Проверен
-                              </span>
-                            )}
                           </div>
                           <h3 className="font-heading font-bold text-text-primary text-lg leading-tight mb-1 group-hover:text-bronze transition-colors">
                             {club.name}
@@ -276,9 +262,6 @@ export default function ClubsPageClient() {
                 </div>
                 <aside className="sticky top-24 border border-border rounded-xl bg-bg-card p-4 space-y-4 self-start">
                   <div className="text-[10px] text-text-muted uppercase tracking-wider font-mono">Реклама</div>
-                  <div className="rounded-lg border border-dashed border-border h-[250px] flex items-center justify-center">
-                    <span className="text-text-muted text-sm">Место для рекламы</span>
-                  </div>
                   <div className="rounded-lg border border-dashed border-border h-[250px] flex items-center justify-center">
                     <span className="text-text-muted text-sm">Место для рекламы</span>
                   </div>
@@ -317,11 +300,6 @@ export default function ClubsPageClient() {
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-success/15 text-success border border-success/25">
                             {club.city}
                           </span>
-                          {club.isVerified && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-success/15 text-success border border-success/25">
-                              Проверен
-                            </span>
-                          )}
                         </div>
                         <h3 className="font-heading font-bold text-text-primary text-lg leading-tight mb-1 group-hover:text-bronze transition-colors">
                           {club.name}

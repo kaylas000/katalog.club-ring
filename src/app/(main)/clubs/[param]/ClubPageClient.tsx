@@ -117,17 +117,17 @@ export default function ClubPageClient({ slug }: { slug: string }) {
                   </div>
                 </div>
 
-                <div className="sm:hidden flex items-center justify-between px-2 py-3 border-t border-border/30">
+                <div className="sm:hidden flex items-center justify-center gap-4 py-3 border-t border-border/30">
                   <button
                     onClick={() => setActivePhoto((prev) => (prev > 0 ? prev - 1 : club.photos.length - 1))}
-                    className="w-11 h-11 rounded-full border border-bronze/30 bg-bg-elevated/70 flex items-center justify-center text-text-secondary hover:text-bronze hover:border-bronze/50 transition-colors"
+                    className="w-10 h-10 rounded-full border border-border/50 bg-bg-elevated/50 flex items-center justify-center text-text-secondary hover:text-bronze transition-colors"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
-                  <span className="text-sm text-text-secondary font-mono tracking-wider">{activePhoto + 1} / {club.photos.length}</span>
+                  <span className="text-sm text-text-secondary font-mono">{activePhoto + 1} / {club.photos.length}</span>
                   <button
                     onClick={() => setActivePhoto((prev) => (prev < club.photos.length - 1 ? prev + 1 : 0))}
-                    className="w-11 h-11 rounded-full border border-bronze/30 bg-bg-elevated/70 flex items-center justify-center text-text-secondary hover:text-bronze hover:border-bronze/50 transition-colors"
+                    className="w-10 h-10 rounded-full border border-border/50 bg-bg-elevated/50 flex items-center justify-center text-text-secondary hover:text-bronze transition-colors"
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { MapPin, Phone, Mail, Star, Check, ChevronRight, ChevronLeft } from "lucide-react";
 import { clubs } from "@/lib/data/clubs.data";
@@ -15,9 +15,56 @@ const dayLabels: Record<string, string> = {
 export default function ClubPageClient({ slug }: { slug: string }) {
   const club = clubs.find((c) => c.slug === slug);
   const [activePhoto, setActivePhoto] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const lightboxRef = useRef<HTMLDivElement>(null);
   const clubTrainers = club
     ? club.trainerIds.map((id) => trainers.find((t) => t.id === id)).filter(Boolean)
     : [];
+
+  const openLightbox = useCallback((index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  }, []);
+
+  const closeLightbox = useCallback(() => {
+    setLightboxOpen(false);
+  }, []);
+
+  const navigateLightbox = useCallback((dir: number) => {
+    setLightboxIndex((prev) => {
+      const next = prev + dir;
+      if (next < 0) return club!.photos.length - 1;
+      if (next >= club!.photos.length) return 0;
+      return next;
+    });
+  }, [club]);
+
+  useEffect(() => {
+    if (lightboxOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [lightboxOpen]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      navigateLightbox(dx > 0 ? -1 : 1);
+    } else if (dy > 80) {
+      closeLightbox();
+    }
+  }, [navigateLightbox, closeLightbox]);
 
   if (!club) {
     return (
@@ -84,7 +131,11 @@ export default function ClubPageClient({ slug }: { slug: string }) {
             {club.photos.length > 0 && (
               <div className="rounded-xl overflow-hidden" style={{ background: "linear-gradient(160deg, #1a1a1f 0%, #111114 55%, #111114 100%)", border: "1px solid rgba(201,162,39,0.1)" }}>
                 <div className="p-4">
-                  <div className="rounded-xl overflow-hidden aspect-video lg:aspect-auto lg:h-[500px] mb-4" style={{ border: "2px solid #C9A227" }}>
+                  <div
+                    className="rounded-xl overflow-hidden aspect-video lg:aspect-auto lg:h-[500px] mb-4 sm:cursor-default cursor-pointer"
+                    style={{ border: "2px solid #C9A227" }}
+                    onClick={() => openLightbox(activePhoto)}
+                  >
                     <img
                       src={club.photos[activePhoto]}
                       alt={`${club.name} — фото ${activePhoto + 1}`}
@@ -329,6 +380,52 @@ export default function ClubPageClient({ slug }: { slug: string }) {
           </div>
         </div>
       </div>
+
+      {lightboxOpen && club.photos.length > 0 && (
+        <div
+          ref={lightboxRef}
+          className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center sm:hidden"
+          onClick={(e) => { if (e.target === lightboxRef.current) closeLightbox(); }}
+        >
+          <button
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/80 hover:text-white transition-colors"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          <div
+            className="flex-1 w-full flex items-center justify-center px-4"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            <img
+              src={club.photos[lightboxIndex]}
+              alt={`${club.name} — фото ${lightboxIndex + 1}`}
+              className="max-w-full max-h-full object-contain select-none"
+              draggable={false}
+            />
+          </div>
+
+          <div className="flex items-center justify-center gap-4 py-4">
+            <button
+              onClick={() => navigateLightbox(-1)}
+              className="w-10 h-10 rounded-full border border-white/20 bg-white/10 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <span className="text-sm text-white/70 font-mono">{lightboxIndex + 1} / {club.photos.length}</span>
+            <button
+              onClick={() => navigateLightbox(1)}
+              className="w-10 h-10 rounded-full border border-white/20 bg-white/10 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

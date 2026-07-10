@@ -83,6 +83,7 @@ document.addEventListener('keydown', e => { if (!keys[e.code]) jp[e.code] = true
 document.addEventListener('keyup', e => { keys[e.code] = false; });
 canvas.addEventListener('mousemove', e => { const r = canvas.getBoundingClientRect(); mouseX = (e.clientX - r.left) * (W / r.width); mouseY = (e.clientY - r.top) * (H / r.height); });
 canvas.addEventListener('mousedown', () => { btnClick = true; });
+canvas.addEventListener('touchstart', e => { const r = canvas.getBoundingClientRect(); const t = e.touches[0]; mouseX = (t.clientX - r.left) * (W / r.width); mouseY = (t.clientY - r.top) * (H / r.height); btnClick = true; }, { passive: true });
 document.addEventListener('mouseup', () => { btnClick = false; });
 function pressed(c) { const v = jp[c]; jp[c] = false; return v; }
 function clearJP() { Object.keys(jp).forEach(k => jp[k] = false); }

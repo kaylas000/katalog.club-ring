@@ -1,7 +1,7 @@
 // ===== CLUB RING BOXING — SPRITE EDITION =====
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
-const W = 800, H = 500, GROUND = 410;
+const W = 800, H = 500, GROUND = 460;
 
 // ===== SPRITE LOADER =====
 const sprites = {};
@@ -78,8 +78,12 @@ function snd(type) {
 // ===== INPUT =====
 const keys = {};
 const jp = {};
+let mouseX = 0, mouseY = 0, btnClick = false;
 document.addEventListener('keydown', e => { if (!keys[e.code]) jp[e.code] = true; keys[e.code] = true; e.preventDefault(); });
 document.addEventListener('keyup', e => { keys[e.code] = false; });
+canvas.addEventListener('mousemove', e => { const r = canvas.getBoundingClientRect(); mouseX = (e.clientX - r.left) * (W / r.width); mouseY = (e.clientY - r.top) * (H / r.height); });
+canvas.addEventListener('mousedown', () => { btnClick = true; });
+document.addEventListener('mouseup', () => { btnClick = false; });
 function pressed(c) { const v = jp[c]; jp[c] = false; return v; }
 function clearJP() { Object.keys(jp).forEach(k => jp[k] = false); }
 
@@ -160,7 +164,8 @@ class Boxer {
         this.hitConnected = false;
         this.cooldown = { jab: 14, cross: 20, hook: 24, uppercut: 30 }[type] || 18;
 
-        if (type === 'jab' || type === 'cross') this.setAnim('PunchRight', 3);
+        if (type === 'jab') this.setAnim('PunchRight', 3);
+        else if (type === 'cross') this.setAnim('PunchLeft', 3);
         else if (type === 'hook') this.setAnim('PunchLeft', 3);
         else if (type === 'uppercut') this.setAnim('PunchUp', 3);
 
@@ -191,12 +196,6 @@ class Boxer {
                 this.state = 'idle';
                 this.setAnim('Idle', 4);
             }
-        }
-    }
-
-    jump() {
-        if (this.y >= GROUND - 2 && this.state !== 'ko' && this.hurtTimer <= 0 && this.state !== 'attack') {
-            this.vy = -14;
         }
     }
 
@@ -241,79 +240,162 @@ class Boxer {
     }
 }
 
-// ===== ARENA =====
+// ===== ARENA — EXACT COPY FROM REFERENCE IMAGE =====
 function drawArena(f) {
-    const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#080015');
-    bg.addColorStop(0.3, '#0f0525');
-    bg.addColorStop(1, '#0d0520');
-    ctx.fillStyle = bg;
+    // Vanishing point (where ropes converge)
+    const VPX = W / 2;
+    const VPY = GROUND - 190;
+
+    // Ring corners — ONE set of coordinates for everything
+    const FL = { x: W * 0.08, y: GROUND };       // Front Left
+    const FR = { x: W * 0.92, y: GROUND };       // Front Right
+    const BL = { x: W * 0.23, y: VPY + 60 };    // Back Left
+    const BR = { x: W * 0.77, y: VPY + 60 };    // Back Right
+
+    // === DARK BACKGROUND ===
+    ctx.fillStyle = '#020208';
     ctx.fillRect(0, 0, W, H);
 
-    // Spotlights
-    ctx.save();
-    [200, 600].forEach((cx, i) => {
-        const sg = ctx.createRadialGradient(cx, 50, 10, cx, GROUND - 80, 250);
-        sg.addColorStop(0, `rgba(255,255,255,${0.05 + Math.sin(f * 0.02 + i) * 0.02})`);
-        sg.addColorStop(1, 'transparent');
-        ctx.fillStyle = sg;
-        ctx.beginPath();
-        ctx.moveTo(cx - 20, 50);
-        ctx.lineTo(cx - 120, GROUND - 80);
-        ctx.lineTo(cx + 120, GROUND - 80);
-        ctx.lineTo(cx + 20, 50);
-        ctx.fill();
-    });
-    ctx.restore();
-
-    // Crowd
-    for (let row = 0; row < 3; row++) {
-        const yy = GROUND - 130 - row * 22;
-        for (let i = 0; i < 24; i++) {
-            const ax = 8 + i * 34 + (row % 2) * 17;
-            const ay = yy + Math.sin(i * 0.7 + f * 0.025 + row) * 3;
-            ctx.fillStyle = `rgba(${20 + row * 8},${20 + row * 8},${30 + row * 8},${0.5 + row * 0.15})`;
-            ctx.beginPath(); ctx.arc(ax, ay, 6 - row, 0, Math.PI * 2); ctx.fill();
-            ctx.fillRect(ax - 3, ay + 5, 6, 7 - row);
+    // === CROWD ===
+    for (let row = 0; row < 8; row++) {
+        const rowY = VPY - 10 - row * 18;
+        const count = 25 + row * 5;
+        for (let i = 0; i < count; i++) {
+            const cx = 15 + i * ((W - 30) / count);
+            const bob = Math.sin(i * 0.9 + f * 0.02 + row) * 2;
+            const sz = 3.5 - row * 0.3;
+            ctx.fillStyle = `rgba(${10 + row * 6},${10 + row * 6},${15 + row * 6},${0.3 + row * 0.05})`;
+            ctx.beginPath(); ctx.arc(cx, rowY + bob, sz, 0, Math.PI * 2); ctx.fill();
         }
     }
 
-    // Floor
-    ctx.fillStyle = '#0a0a18';
-    ctx.fillRect(0, GROUND, W, H - GROUND);
-
-    // Mat
-    const matG = ctx.createLinearGradient(0, GROUND, 0, GROUND + 40);
-    matG.addColorStop(0, '#b81020');
-    matG.addColorStop(1, '#8a0a15');
-    ctx.fillStyle = matG;
-    ctx.fillRect(40, GROUND, W - 80, 40);
-
+    // Camera flashes
     ctx.fillStyle = '#fff';
-    ctx.fillRect(40, GROUND + 3, W - 80, 2);
-    ctx.fillRect(40, GROUND + 35, W - 80, 2);
-
-    // Ropes
-    for (let i = 0; i < 3; i++) {
-        const ry = GROUND - 15 - i * 42;
-        ctx.strokeStyle = '#ddd';
-        ctx.lineWidth = 5;
-        ctx.beginPath(); ctx.moveTo(50, ry); ctx.lineTo(W - 50, ry); ctx.stroke();
+    for (let i = 0; i < 50; i++) {
+        const sx = (Math.sin(i * 127.1) * 0.5 + 0.5) * W;
+        const sy = VPY - 20 - (i % 8) * 18 + (Math.cos(i * 311.7) * 0.5 + 0.5) * 30;
+        if (Math.sin(f * 0.08 + i * 5.7) > 0.75) {
+            ctx.globalAlpha = 0.5 + Math.sin(f * 0.12 + i) * 0.3;
+            ctx.beginPath(); ctx.arc(sx, sy, 1 + Math.sin(i) * 0.5, 0, Math.PI * 2); ctx.fill();
+        }
     }
+    ctx.globalAlpha = 1;
 
-    // Posts
-    [45, W - 55].forEach(px => {
-        ctx.fillStyle = '#888';
-        ctx.fillRect(px, GROUND - 135, 10, 150);
-        ctx.fillStyle = '#c8102e';
-        ctx.beginPath(); ctx.arc(px + 5, GROUND - 135, 7, 0, Math.PI * 2); ctx.fill();
+    // === SPOTLIGHTS ===
+    [W * 0.18, W * 0.38, W * 0.5, W * 0.62, W * 0.82].forEach((sx, i) => {
+        // Light source
+        const ig = ctx.createRadialGradient(sx, 15, 2, sx, 15, 18);
+        ig.addColorStop(0, `rgba(200,220,255,${0.6 + Math.sin(f * 0.02 + i) * 0.15})`);
+        ig.addColorStop(1, 'transparent');
+        ctx.fillStyle = ig;
+        ctx.beginPath(); ctx.arc(sx, 15, 18, 0, Math.PI * 2); ctx.fill();
+
+        // Beam
+        ctx.fillStyle = `rgba(150,180,255,${0.025 + Math.sin(f * 0.01 + i) * 0.01})`;
+        ctx.beginPath();
+        ctx.moveTo(sx - 6, 30);
+        ctx.lineTo(sx - 50, GROUND - 40);
+        ctx.lineTo(sx + 50, GROUND - 40);
+        ctx.lineTo(sx + 6, 30);
+        ctx.fill();
     });
 
-    // Logo
-    ctx.font = '11px "Press Start 2P"';
-    ctx.fillStyle = '#c8102e';
+    // === BLUE CANVAS FLOOR ===
+    const canvasG = ctx.createLinearGradient(0, FL.y, 0, FL.y + 50);
+    canvasG.addColorStop(0, '#1a4080');
+    canvasG.addColorStop(0.5, '#2055a0');
+    canvasG.addColorStop(1, '#153060');
+    ctx.fillStyle = canvasG;
+    ctx.beginPath();
+    ctx.moveTo(FL.x, FL.y);
+    ctx.lineTo(FR.x, FR.y);
+    ctx.lineTo(BR.x, BR.y);
+    ctx.lineTo(BL.x, BL.y);
+    ctx.closePath();
+    ctx.fill();
+
+    // Canvas light reflection
+    const reflG = ctx.createRadialGradient(W / 2, FL.y + 25, 10, W / 2, FL.y + 25, 200);
+    reflG.addColorStop(0, 'rgba(100,160,240,0.12)');
+    reflG.addColorStop(1, 'transparent');
+    ctx.fillStyle = reflG;
+    ctx.fillRect(FL.x, FL.y, FR.x - FL.x, 60);
+
+    // "CLUB RING" on canvas — Club Ring style
+    ctx.save();
+    ctx.translate(W / 2, FL.y + 25);
+    ctx.transform(1, 0, 0, 0.35, 0, 0);
+    ctx.font = 'bold 56px "Bebas Neue"';
     ctx.textAlign = 'center';
-    ctx.fillText('CLUB RING', W / 2, GROUND - 140);
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillText('CLUB RING', 2, 2);
+    // Bronze text
+    const textGrad = ctx.createLinearGradient(-80, 0, 80, 0);
+    textGrad.addColorStop(0, '#8B6914');
+    textGrad.addColorStop(0.5, '#D4A843');
+    textGrad.addColorStop(1, '#8B6914');
+    ctx.fillStyle = textGrad;
+    ctx.fillText('CLUB RING', 0, 0);
+    ctx.restore();
+
+    // === CORNER POSTS — at ring corners ===
+    const postH = 70; // front posts
+    const bPostH = 50; // back posts
+
+    // Front Left — WHITE
+    ctx.fillStyle = '#ddd';
+    ctx.fillRect(FL.x - 4, FL.y - postH, 8, postH);
+    ctx.fillStyle = '#eee';
+    ctx.beginPath(); ctx.arc(FL.x, FL.y - postH, 5, 0, Math.PI * 2); ctx.fill();
+
+    // Front Right — WHITE
+    ctx.fillStyle = '#ddd';
+    ctx.fillRect(FR.x - 4, FR.y - postH, 8, postH);
+    ctx.fillStyle = '#eee';
+    ctx.beginPath(); ctx.arc(FR.x, FR.y - postH, 5, 0, Math.PI * 2); ctx.fill();
+
+    // Back Left — WHITE
+    ctx.fillStyle = '#ccc';
+    ctx.fillRect(BL.x - 2, BL.y - bPostH, 5, bPostH);
+    ctx.fillStyle = '#ddd';
+    ctx.beginPath(); ctx.arc(BL.x, BL.y - bPostH, 3, 0, Math.PI * 2); ctx.fill();
+
+    // Back Right — WHITE
+    ctx.fillStyle = '#ccc';
+    ctx.fillRect(BR.x - 2, BR.y - bPostH, 5, bPostH);
+    ctx.fillStyle = '#ddd';
+    ctx.beginPath(); ctx.arc(BR.x, BR.y - bPostH, 3, 0, Math.PI * 2); ctx.fill();
+
+    // === ROPES — connect posts ===
+    const ropeC = ['#cc2222', '#ffffff', '#cc2222'];
+    const ropeH = [0, 20, 40];
+
+    for (let r = 0; r < 3; r++) {
+        const h = ropeH[r];
+        const c = ropeC[r];
+
+        // Left: FL → BL
+        ctx.strokeStyle = c;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(FL.x, FL.y - postH + h);
+        ctx.lineTo(BL.x, BL.y - bPostH + h);
+        ctx.stroke();
+
+        // Right: FR → BR
+        ctx.beginPath();
+        ctx.moveTo(FR.x, FR.y - postH + h);
+        ctx.lineTo(BR.x, BR.y - bPostH + h);
+        ctx.stroke();
+
+        // Back: BL → BR
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(BL.x, BL.y - bPostH + h);
+        ctx.lineTo(BR.x, BR.y - bPostH + h);
+        ctx.stroke();
+    }
 }
 
 // ===== HEAVY BAG =====
@@ -359,11 +441,13 @@ function drawBag() {
         ctx.stroke();
     }
 
-    // Highlight
-    ctx.fillStyle = 'rgba(255,255,255,0.06)';
-    ctx.beginPath();
-    ctx.ellipse(-6, -55, 5, 40, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // Highlight — появляется при ударе
+    if (Math.abs(bag.vel) > 0.005) {
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.beginPath();
+        ctx.ellipse(-6, -55, 5, 40, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
 
     ctx.restore();
 }
@@ -412,18 +496,6 @@ function drawEffects() {
         ctx.translate(e.x, e.y);
         ctx.globalAlpha = a;
 
-        const sz = 20 + e.frame * 2;
-        const fg = ctx.createRadialGradient(0, 0, 0, 0, 0, sz);
-        fg.addColorStop(0, 'rgba(255,255,255,0.8)');
-        fg.addColorStop(0.4, 'rgba(255,150,0,0.4)');
-        fg.addColorStop(1, 'transparent');
-        ctx.fillStyle = fg;
-        ctx.beginPath(); ctx.arc(0, 0, sz, 0, Math.PI * 2); ctx.fill();
-
-        ctx.strokeStyle = '#ffcc00';
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(0, 0, sz + e.frame * 3, 0, Math.PI * 2); ctx.stroke();
-
         e.particles.forEach(p => {
             ctx.fillStyle = p.color;
             ctx.beginPath(); ctx.arc(p.x, p.y, p.size * a, 0, Math.PI * 2); ctx.fill();
@@ -435,63 +507,102 @@ function drawEffects() {
 
 // ===== HUD =====
 function drawHUD(p1, p2, timer, round, scores) {
+    // Top bar background
+    ctx.fillStyle = 'rgba(10,10,11,0.85)';
+    ctx.fillRect(0, 0, W, 60);
+
+    // Bronze divider
+    const divG = ctx.createLinearGradient(0, 59, W, 59);
+    divG.addColorStop(0, 'transparent');
+    divG.addColorStop(0.5, '#C9A227');
+    divG.addColorStop(1, 'transparent');
+    ctx.fillStyle = divG;
+    ctx.fillRect(0, 59, W, 1);
+
     drawHP(20, 12, p1.health, 100, false, p1.name);
     drawHP(W - 270, 12, p2.health, 100, true, p2.name);
 
     // Timer
     const cx = W / 2;
-    ctx.fillStyle = '#000';
-    ctx.beginPath(); ctx.arc(cx, 33, 30, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = '#c8102e'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(cx, 33, 30, 0, Math.PI * 2); ctx.stroke();
-    ctx.font = '22px "Press Start 2P"';
-    ctx.fillStyle = timer <= 10 ? '#e74c3c' : '#fff';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.shadowColor = '#000'; ctx.shadowBlur = 4;
-    ctx.fillText(Math.ceil(timer).toString(), cx, 35);
-    ctx.shadowBlur = 0;
-    ctx.font = '7px "Press Start 2P"';
-    ctx.fillStyle = '#888';
-    ctx.fillText(`ROUND ${round}`, cx, 57);
+    ctx.font = '12px "Bebas Neue"';
+    ctx.fillStyle = '#C9A227';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText(`РАУНД ${round}`, cx, 6);
+    ctx.fillStyle = '#0A0A0B';
+    ctx.beginPath(); ctx.arc(cx, 40, 22, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#C9A227'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx, 40, 22, 0, Math.PI * 2); ctx.stroke();
+    ctx.font = '20px "Bebas Neue"';
+    ctx.fillStyle = timer <= 10 ? '#ef5350' : '#F0F0F4';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(Math.ceil(timer).toString(), cx, 40);
 
     // Score
-    ctx.font = '10px "Press Start 2P"';
-    ctx.fillStyle = '#c8102e';
-    ctx.textAlign = 'center';
+    ctx.font = '10px "Montserrat"';
+    ctx.fillStyle = '#C9A227';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     ctx.fillText(`${scores[0]} — ${scores[1]}`, W / 2, 72);
 
     // Stamina
     [{ p: p1, x: 20 }, { p: p2, x: W - 270 }].forEach(({ p, x: sx }) => {
-        ctx.fillStyle = '#111';
+        ctx.fillStyle = '#1A1A1F';
         ctx.fillRect(sx, 46, 250, 6);
-        ctx.fillStyle = p.stamina > 25 ? '#2980b9' : '#e74c3c';
+        ctx.fillStyle = p.stamina > 25 ? '#C9A227' : '#ef5350';
         if (sx < W / 2) ctx.fillRect(sx, 46, (p.stamina / 100) * 250, 6);
         else ctx.fillRect(sx + (1 - p.stamina / 100) * 250, 46, (p.stamina / 100) * 250, 6);
-        ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
+        ctx.strokeStyle = '#2A2A35'; ctx.lineWidth = 1;
         ctx.strokeRect(sx, 46, 250, 6);
     });
+
+    // Кнопки соцсетей — те же позиции что и на тренировке
+    const socialY = 82;
+    const socialW = 130, socialH = 30;
+
+    // Club Ring YouTube — слева
+    const ytX = W / 2 - 170;
+    const ytHover = mouseX > ytX && mouseX < ytX + socialW && mouseY > socialY && mouseY < socialY + socialH;
+    ctx.fillStyle = ytHover ? 'rgba(201,162,39,0.2)' : 'rgba(10,10,11,0.85)';
+    ctx.fillRect(ytX, socialY, socialW, socialH);
+    ctx.strokeStyle = '#C9A227'; ctx.lineWidth = 1;
+    ctx.strokeRect(ytX, socialY, socialW, socialH);
+    ctx.font = '14px "Bebas Neue"';
+    ctx.fillStyle = '#C9A227';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Club Ring YouTube', ytX + socialW / 2, socialY + socialH / 2);
+
+    // Club Ring Telegram — справа
+    const tgX = W / 2 + 40;
+    const tgHover = mouseX > tgX && mouseX < tgX + socialW && mouseY > socialY && mouseY < socialY + socialH;
+    ctx.fillStyle = tgHover ? 'rgba(201,162,39,0.2)' : 'rgba(10,10,11,0.85)';
+    ctx.fillRect(tgX, socialY, socialW, socialH);
+    ctx.strokeStyle = '#C9A227'; ctx.lineWidth = 1;
+    ctx.strokeRect(tgX, socialY, socialW, socialH);
+    ctx.fillStyle = '#C9A227';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Club Ring Telegram', tgX + socialW / 2, socialY + socialH / 2);
+    ctx.textBaseline = 'alphabetic';
 }
 
 function drawHP(x, y, hp, max, flip, name) {
     const bw = 250, bh = 28;
     const fill = (hp / max) * bw;
-    ctx.fillStyle = '#0a0a0a';
+    ctx.fillStyle = '#1A1A1F';
     ctx.fillRect(x - 3, y - 3, bw + 6, bh + 6);
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = '#111114';
     ctx.fillRect(x, y, bw, bh);
-    const col = hp > 60 ? '#27ae60' : hp > 30 ? '#e67e22' : '#c0392b';
+    const col = hp > 60 ? '#2D6A4F' : hp > 30 ? '#C9A227' : '#7B2D2D';
     ctx.fillStyle = col;
     if (flip) ctx.fillRect(x + bw - fill, y, fill, bh);
     else ctx.fillRect(x, y, fill, bh);
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
     if (flip) ctx.fillRect(x + bw - fill, y, fill, bh * 0.4);
     else ctx.fillRect(x, y, fill, bh * 0.4);
-    ctx.strokeStyle = '#555'; ctx.lineWidth = 2;
+    ctx.strokeStyle = '#2A2A35'; ctx.lineWidth = 1;
     ctx.strokeRect(x, y, bw, bh);
-    ctx.font = '8px "Press Start 2P"';
-    ctx.fillStyle = '#ccc';
+    ctx.font = '9px "Montserrat"';
+    ctx.fillStyle = '#B0B1B8';
     ctx.textAlign = flip ? 'right' : 'left';
-    ctx.fillText(name, flip ? x + bw - 5 : x + 5, y - 5);
+    ctx.fillText(name, flip ? x + bw - 5 : x + 5, y - 6);
 }
 
 // ===== DRAW BOXER (real sprites) =====
@@ -505,36 +616,40 @@ function drawBoxer(b) {
     ctx.save();
     ctx.translate(b.x, b.y);
 
-    // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    // Shadow — larger, softer, on canvas floor
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.beginPath();
-    ctx.ellipse(0, 0, spriteW * 0.35, 8, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 5, spriteW * 0.4, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Inner shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(0, 3, spriteW * 0.25, 5, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // Flip for facing
     if (b.facing === -1) ctx.scale(-1, 1);
 
+    // Glow on attack
+    if (b.state === 'attack') {
+        ctx.shadowColor = b.useBlue ? '#4488ff' : '#ff4444';
+        ctx.shadowBlur = 15;
+    }
+
     // Draw sprite
-    if (frame instanceof HTMLCanvasElement) {
-        ctx.drawImage(frame, -spriteW / 2, -spriteH, spriteW, spriteH);
-    } else {
-        ctx.drawImage(frame, -spriteW / 2, -spriteH, spriteW, spriteH);
-    }
+    ctx.drawImage(frame, -spriteW / 2, -spriteH, spriteW, spriteH);
 
-    // Player indicator above head
-    if (b.tint) {
-        ctx.fillStyle = b.tint;
+    ctx.shadowBlur = 0;
+
+    // Block shimmer
+    if (b.state === 'block') {
+        ctx.strokeStyle = 'rgba(100,200,255,0.4)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
         ctx.beginPath();
-        ctx.moveTo(0, -spriteH - 12);
-        ctx.lineTo(-6, -spriteH - 4);
-        ctx.lineTo(6, -spriteH - 4);
-        ctx.fill();
-    }
-
-    // Hurt flash
-    if (b.state === 'hurt' && b.hurtTimer > 10) {
-        ctx.fillStyle = 'rgba(255,50,50,0.3)';
-        ctx.fillRect(-spriteW / 2, -spriteH, spriteW, spriteH);
+        ctx.ellipse(0, -spriteH / 2, spriteW * 0.5, spriteH * 0.45, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
     }
 
     ctx.restore();
@@ -563,7 +678,7 @@ class AI {
         const d = Math.abs(me.x - op.x), dx = op.x - me.x;
         const a = { move: 0, punch: null, block: false };
 
-        if (d < 85) {
+        if (d < 150) {
             if (op.state === 'attack' && Math.random() < this.b) {
                 a.block = true;
             } else if (Math.random() < this.a) {
@@ -588,7 +703,7 @@ class AI {
 function startTraining() {
     initAudio();
     G.phase = 'training';
-    G.fighters = [new Boxer(400, 1, null, 'YOU')];
+    G.fighters = [new Boxer(300, 1, null, 'YOU')];
     G.bagHits = 0;
     bag.hp = 100; bag.angle = 0; bag.vel = 0;
     document.getElementById('mainMenu').classList.add('hidden');
@@ -602,12 +717,13 @@ function startFight(mode) {
     G.round = 1;
     G.scores = [0, 0];
     G.fighters = [
-        new Boxer(200, 1, null, 'PLAYER 1', false),
-        new Boxer(600, -1, null, mode === 'ai' ? 'CPU' : 'PLAYER 2', true)
+        new Boxer(200, 1, null, 'ИГРОК 1', false),
+        new Boxer(600, -1, null, mode === 'ai' ? 'КОМПЬЮТЕР' : 'ИГРОК 2', true)
     ];
     G.ai = mode === 'ai' ? new AI(G.difficulty) : null;
     G.timer = 99;
     document.getElementById('mainMenu').classList.add('hidden');
+    document.getElementById('resultScreen').classList.add('hidden');
     document.getElementById('controlsDisplay').classList.add('hidden');
     snd('bell');
     setTimeout(() => G.phase = 'fight', 1500);
@@ -621,17 +737,17 @@ function endRound(winner) {
     } else G.scores[winner - 1]++;
     snd('bell');
 
-    if (G.scores[0] >= 2 || G.scores[1] >= 2 || G.round >= 3) {
+    G.round++;
+    if (G.round > 3) {
         setTimeout(() => {
             G.phase = 'result';
             const ko = G.scores[0] >= 2 || G.scores[1] >= 2;
-            const w = G.scores[0] > G.scores[1] ? 'PLAYER 1 WINS!' : G.scores[1] > G.scores[0] ? (G.mode === 'ai' ? 'CPU WINS!' : 'PLAYER 2 WINS!') : 'DRAW!';
-            document.getElementById('resultTitle').textContent = ko ? 'K.O.!' : 'TIME UP!';
+            const w = G.scores[0] > G.scores[1] ? 'ИГРОК 1 ПОБЕДИЛ!' : G.scores[1] > G.scores[0] ? (G.mode === 'ai' ? 'КОМПЬЮТЕР ПОБЕДИЛ!' : 'ИГРОК 2 ПОБЕДИЛ!') : 'НИЧЬЯ!';
+            document.getElementById('resultTitle').textContent = ko ? 'НОКАУТ!' : 'ВРЕМЯ ВЫШЛО!';
             document.getElementById('resultWinner').textContent = w;
             document.getElementById('resultScreen').classList.remove('hidden');
         }, 1500);
     } else {
-        G.round++;
         setTimeout(() => {
             G.fighters.forEach((p, i) => { p.x = i === 0 ? 200 : 600; p.health = 100; p.stamina = 100; p.state = 'idle'; p.setAnim('Idle', 4); p.cooldown = 0; p.hurtTimer = 0; });
             G.timer = 99; G.phase = 'intro'; snd('bell');
@@ -665,10 +781,8 @@ function loop() {
     if (G.phase === 'training') {
         const p = G.fighters[0];
         if (keys['KeyA']) p.move(-1); else if (keys['KeyD']) p.move(1); else p.move(0);
-        if (keys['KeyW']) p.jump();
         if (pressed('Space')) p.punch('jab');
-        if (pressed('KeyF')) p.punch('cross');
-        if (pressed('KeyG')) p.punch('hook');
+        if (pressed('KeyG')) p.punch('cross');
         if (pressed('KeyE')) p.punch('uppercut');
         p.block(keys['KeyQ']);
         p.update();
@@ -695,40 +809,80 @@ function loop() {
         // HUD
         ctx.font = '10px "Press Start 2P"';
         ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
-        ctx.fillText(`HITS: ${G.bagHits}`, 20, 25);
+        ctx.fillText(`УДАРЫ: ${G.bagHits}`, 20, 25);
 
-        ctx.fillStyle = '#1a1a1a';
-        ctx.fillRect(W / 2 - 100, 12, 200, 14);
-        ctx.fillStyle = '#c8102e';
-        ctx.fillRect(W / 2 - 100, 12, bag.hp * 2, 14);
-        ctx.strokeStyle = '#555'; ctx.lineWidth = 1;
-        ctx.strokeRect(W / 2 - 100, 12, 200, 14);
-        ctx.font = '7px "Press Start 2P"';
-        ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
-        ctx.fillText('HEAVY BAG', W / 2, 10);
+        // HUD тренировки
+        ctx.fillStyle = 'rgba(10,10,11,0.85)';
+        ctx.fillRect(0, 0, W, 38);
+        const divG = ctx.createLinearGradient(0, 37, W, 37);
+        divG.addColorStop(0, 'transparent');
+        divG.addColorStop(0.5, '#C9A227');
+        divG.addColorStop(1, 'transparent');
+        ctx.fillStyle = divG;
+        ctx.fillRect(0, 37, W, 1);
 
+        ctx.fillStyle = '#1A1A1F';
+        ctx.fillRect(W / 2 - 100, 10, 200, 14);
+        ctx.fillStyle = '#C9A227';
+        ctx.fillRect(W / 2 - 100, 10, bag.hp * 2, 14);
+        ctx.strokeStyle = '#2A2A35'; ctx.lineWidth = 1;
+        ctx.strokeRect(W / 2 - 100, 10, 200, 14);
+
+        // Reset bag when HP reaches 0
         if (bag.hp <= 0) {
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
-            ctx.fillRect(0, 0, W, H);
-            ctx.font = '18px "Press Start 2P"';
-            ctx.fillStyle = '#c8102e'; ctx.textAlign = 'center';
-            ctx.fillText('TRAINING COMPLETE!', W / 2, H / 2 - 20);
-            ctx.font = '10px "Press Start 2P"';
-            ctx.fillStyle = '#fff';
-            ctx.fillText(`${G.bagHits} HITS`, W / 2, H / 2 + 15);
-            ctx.fillText('Press ENTER to fight', W / 2, H / 2 + 40);
-            if (pressed('Enter')) startFight('ai');
+            bag.hp = 100;
+            bag.angle = 0;
+            bag.vel = 0;
         }
 
+        // Кнопка "В БОЙ" — по центру
+        const btnX = W / 2 - 65, btnY = 85, btnW = 130, btnH = 25;
+        const btnHover = mouseX > btnX && mouseX < btnX + btnW && mouseY > btnY && mouseY < btnY + btnH;
+        ctx.fillStyle = btnHover ? 'rgba(201,162,39,0.2)' : 'rgba(10,10,11,0.85)';
+        ctx.fillRect(btnX, btnY, btnW, btnH);
+        ctx.strokeStyle = '#C9A227';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(btnX, btnY, btnW, btnH);
+        ctx.font = '10px "Montserrat"';
+        ctx.fillStyle = '#C9A227';
+        ctx.textAlign = 'center';
+        ctx.fillText('В БОЙ', btnX + btnW / 2, btnY + 16);
+
+        // Club Ring YouTube — слева от "В БОЙ"
+        const ytX = W / 2 - 300, ytY = 82, ytW = 130, ytH = 30;
+        const ytHover = mouseX > ytX && mouseX < ytX + ytW && mouseY > ytY && mouseY < ytY + ytH;
+        ctx.fillStyle = ytHover ? 'rgba(201,162,39,0.2)' : 'rgba(10,10,11,0.85)';
+        ctx.fillRect(ytX, ytY, ytW, ytH);
+        ctx.strokeStyle = '#C9A227';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(ytX, ytY, ytW, ytH);
+        ctx.font = '14px "Bebas Neue"';
+        ctx.fillStyle = '#C9A227';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('Club Ring YouTube', ytX + ytW / 2, ytY + ytH / 2);
+
+        // Club Ring Telegram — справа от "В БОЙ"
+        const tgX = W / 2 + 170, tgY = 82, tgW = 130, tgH = 30;
+        const tgHover = mouseX > tgX && mouseX < tgX + tgW && mouseY > tgY && mouseY < tgY + tgH;
+        ctx.fillStyle = tgHover ? 'rgba(201,162,39,0.2)' : 'rgba(10,10,11,0.85)';
+        ctx.fillRect(tgX, tgY, tgW, tgH);
+        ctx.strokeStyle = '#C9A227';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(tgX, tgY, tgW, tgH);
+        ctx.fillStyle = '#C9A227';
+        ctx.fillText('Club Ring Telegram', tgX + tgW / 2, tgY + tgH / 2);
+        ctx.textBaseline = 'alphabetic';
+
+        if (btnClick && btnHover) startFight('ai');
+
     } else if (G.phase === 'fight' || G.phase === 'ko') {
+        document.getElementById('controlsDisplay').classList.add('hidden');
         const [p1, p2] = G.fighters;
 
         if (G.phase === 'fight') {
             if (keys['KeyA']) p1.move(-1); else if (keys['KeyD']) p1.move(1); else p1.move(0);
-            if (keys['KeyW']) p1.jump();
             if (pressed('Space')) p1.punch('jab');
-            if (pressed('KeyF')) p1.punch('cross');
-            if (pressed('KeyG')) p1.punch('hook');
+            if (pressed('KeyG')) p1.punch('cross');
             if (pressed('KeyE')) p1.punch('uppercut');
             p1.block(keys['KeyQ']);
 
@@ -769,6 +923,26 @@ function loop() {
         }
 
         p1.update(); p2.update();
+
+        // Boxer collision — sprites are 224px wide, need enough space
+        const minDist = spriteW * 0.6;
+        const dx = p2.x - p1.x;
+        const dist = Math.abs(dx);
+        if (dist < minDist) {
+            const push = (minDist - dist) / 2 + 1;
+            if (dx > 0) { p1.x -= push; p2.x += push; }
+            else { p1.x += push; p2.x -= push; }
+            // Stop movement
+            p1.vx = 0;
+            p2.vx = 0;
+        }
+
+        // Keep boxers inside ring (between front posts)
+        const ringLeft = W * 0.08 + 20;
+        const ringRight = W * 0.92 - 20;
+        p1.x = Math.max(ringLeft, Math.min(ringRight, p1.x));
+        p2.x = Math.max(ringLeft, Math.min(ringRight, p2.x));
+
         p1.facing = p1.x < p2.x ? 1 : -1;
         p2.facing = p2.x < p1.x ? 1 : -1;
         updateEffects();
@@ -783,25 +957,21 @@ function loop() {
         drawEffects();
 
         if (G.phase === 'intro') {
-            ctx.fillStyle = 'rgba(0,0,0,0.65)';
+            ctx.fillStyle = 'rgba(10,10,11,0.7)';
             ctx.fillRect(0, 0, W, H);
-            ctx.font = '32px "Press Start 2P"';
-            ctx.fillStyle = '#c8102e'; ctx.textAlign = 'center';
-            ctx.shadowColor = '#c8102e'; ctx.shadowBlur = 20;
-            ctx.fillText(`ROUND ${G.round}`, W / 2, H / 2 - 15);
-            ctx.font = '18px "Press Start 2P"';
-            ctx.fillStyle = '#fff';
-            ctx.fillText('FIGHT!', W / 2, H / 2 + 25);
-            ctx.shadowBlur = 0;
+            ctx.font = '48px "Bebas Neue"';
+            ctx.fillStyle = '#C9A227'; ctx.textAlign = 'center';
+            ctx.fillText(`РАУНД ${G.round}`, W / 2, H / 2 - 20);
+            ctx.font = '24px "Montserrat"';
+            ctx.fillStyle = '#F0F0F4';
+            ctx.fillText('БОЙ!', W / 2, H / 2 + 20);
         }
         if (G.phase === 'ko') {
-            ctx.fillStyle = 'rgba(0,0,0,0.55)';
+            ctx.fillStyle = 'rgba(10,10,11,0.65)';
             ctx.fillRect(0, 0, W, H);
-            ctx.font = '42px "Press Start 2P"';
-            ctx.fillStyle = '#c8102e'; ctx.textAlign = 'center';
-            ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 30;
-            ctx.fillText('K.O.!', W / 2, H / 2);
-            ctx.shadowBlur = 0;
+            ctx.font = '64px "Bebas Neue"';
+            ctx.fillStyle = '#C9A227'; ctx.textAlign = 'center';
+            ctx.fillText('НОКАУТ!', W / 2, H / 2);
         }
         ctx.restore();
     }
@@ -845,10 +1015,6 @@ function initTouchControls() {
         () => { touch.right = true; keys['KeyD'] = true; },
         () => { touch.right = false; keys['KeyD'] = false; }
     );
-    setupBtn('btnJump',
-        () => { keys['KeyW'] = true; },
-        () => { keys['KeyW'] = false; }
-    );
     setupBtn('btnBlock',
         () => { touch.block = true; keys['KeyQ'] = true; },
         () => { touch.block = false; keys['KeyQ'] = false; }
@@ -871,7 +1037,6 @@ function initTouchControls() {
     }
 
     tapOnce('btnJab', 'Space');
-    tapOnce('btnCross', 'KeyF');
-    tapOnce('btnHook', 'KeyG');
+    tapOnce('btnCross', 'KeyG');
     tapOnce('btnUpper', 'KeyE');
 }

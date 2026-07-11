@@ -585,6 +585,9 @@ function drawHUD(p1, p2, timer, round, scores) {
 
     // YouTube click
     if (btnClick && ytHover) window.open('https://www.youtube.com/@club-ring', '_blank');
+
+    // Telegram click
+    if (btnClick && tgHover) window.open('https://t.me/club_ring', '_blank');
 }
 
 function drawHP(x, y, hp, max, flip, name) {
@@ -881,6 +884,9 @@ function loop() {
 
         // YouTube click
         if (btnClick && ytHover) window.open('https://www.youtube.com/@club-ring', '_blank');
+
+        // Telegram click
+        if (btnClick && tgHover) window.open('https://t.me/club_ring', '_blank');
 
     } else if (G.phase === 'fight' || G.phase === 'ko') {
         document.getElementById('controlsDisplay').classList.add('hidden');

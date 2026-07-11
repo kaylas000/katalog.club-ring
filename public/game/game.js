@@ -134,7 +134,11 @@ class Boxer {
                     this.state = 'idle';
                     this.setAnim('Idle', 4);
                 }
-                this.animFrame = 0;
+                if (this.state !== 'ko') {
+                    this.animFrame = 0;
+                } else {
+                    this.animFrame = frames - 1; // Stay on last frame
+                }
             }
         }
     }

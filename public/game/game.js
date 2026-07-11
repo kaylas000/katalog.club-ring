@@ -582,6 +582,9 @@ function drawHUD(p1, p2, timer, round, scores) {
     ctx.textBaseline = 'middle';
     ctx.fillText('Club Ring Telegram', tgX + socialW / 2, socialY + socialH / 2);
     ctx.textBaseline = 'alphabetic';
+
+    // YouTube click
+    if (btnClick && ytHover) window.open('https://www.youtube.com/@club-ring', '_blank');
 }
 
 function drawHP(x, y, hp, max, flip, name) {
@@ -875,6 +878,9 @@ function loop() {
         ctx.textBaseline = 'alphabetic';
 
         if (btnClick && btnHover) startFight('ai');
+
+        // YouTube click
+        if (btnClick && ytHover) window.open('https://www.youtube.com/@club-ring', '_blank');
 
     } else if (G.phase === 'fight' || G.phase === 'ko') {
         document.getElementById('controlsDisplay').classList.add('hidden');

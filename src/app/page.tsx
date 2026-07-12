@@ -6,6 +6,7 @@ import { CtaBanner } from "@/components/home/CtaBanner";
 
 export default function HomePage() {
   const sections = [
+    <HeroSection key="hero" />,
     <FeaturedClubs key="clubs" />,
     <FeaturedProducts key="products" />,
     <LatestNews key="news" />,
@@ -13,28 +14,19 @@ export default function HomePage() {
   ];
 
   return (
-    <>
-      {/* Герой — всегда зафиксирован позади всего */}
-      <div className="fixed inset-0 z-0">
-        <HeroSection />
-      </div>
-
-      {/* Остальные секции — наезжают на героя */}
-      <div className="relative z-10">
-        {sections.map((section, i) => (
-          <div key={i} style={{ minHeight: '150vh' }}>
-            <div
-              className="sticky top-0 h-screen overflow-hidden"
-              style={{
-                zIndex: i + 1,
-                backgroundColor: i % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)',
-              }}
-            >
-              {section}
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
+    <div className="relative" style={{ height: `${sections.length * 100}vh` }}>
+      {sections.map((section, i) => (
+        <div
+          key={i}
+          className="sticky top-0 h-screen overflow-hidden"
+          style={{
+            zIndex: i,
+            backgroundColor: i % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)',
+          }}
+        >
+          {section}
+        </div>
+      ))}
+    </div>
   );
 }

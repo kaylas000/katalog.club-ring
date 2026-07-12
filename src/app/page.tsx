@@ -14,17 +14,19 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="relative" style={{ height: `${sections.length * 100}vh` }}>
+    <div>
       {sections.map((section, i) => (
-        <div
-          key={i}
-          className="sticky top-0 h-screen overflow-hidden"
-          style={{
-            zIndex: i,
-            backgroundColor: i % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)',
-          }}
-        >
-          {section}
+        <div key={i} style={{ height: '150vh', position: 'relative' }}>
+          <div
+            className="sticky top-0 overflow-hidden"
+            style={{
+              height: '100vh',
+              zIndex: i,
+              backgroundColor: i % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)',
+            }}
+          >
+            {section}
+          </div>
         </div>
       ))}
     </div>

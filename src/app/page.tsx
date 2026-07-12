@@ -13,8 +13,8 @@ export default function HomePage() {
   ];
 
   return (
-    <div>
-      {/* Герой — всегда зафиксирован */}
+    <>
+      {/* Герой — всегда зафиксирован позади всего */}
       <div className="fixed inset-0 z-0">
         <HeroSection />
       </div>
@@ -22,11 +22,10 @@ export default function HomePage() {
       {/* Остальные секции — наезжают на героя */}
       <div className="relative z-10">
         {sections.map((section, i) => (
-          <div key={i} style={{ height: '150vh' }}>
+          <div key={i} style={{ minHeight: '150vh' }}>
             <div
-              className="sticky top-0 overflow-hidden"
+              className="sticky top-0 h-screen overflow-hidden"
               style={{
-                height: '100vh',
                 zIndex: i + 1,
                 backgroundColor: i % 2 === 0 ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)',
               }}
@@ -36,6 +35,6 @@ export default function HomePage() {
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }
